@@ -38,12 +38,12 @@ pub fn New(points: u32, players: (Player, Player), rules: Rules) -> Result<Match
     };
 
     return Ok(Match {
-        id: id,
-        points: points,
-        rules: rules,
+        id,
+        points,
+        rules,
         history: Vec::new(),
-        players: players,
-        time_start: time_start,
+        players,
+        time_start,
         time_end: time_start,
     });
 }
