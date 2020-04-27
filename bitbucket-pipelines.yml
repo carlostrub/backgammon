@@ -1,0 +1,89 @@
+# This is a sample build configuration for Rust.
+# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: rust:latest
+clone:
+      depth: full
+
+definitions:
+      caches:
+            sonar: ~/.sonar/cache  # Caching SonarCloud artifacts will speed up your build
+            cargo: /usr/local/cargo
+            cargo-target: target
+      steps:
+      - step: &clippy
+              name: Static Code Analysis
+              caches:
+              - cargo
+              script:
+              - rustup component add clippy
+              - cargo clippy --all-targets --all-features -- -D warnings
+      - step: &build
+              name: Build
+              caches:
+              - cargo
+              - cargo-target
+              script:
+              - cargo build -v
+      - step: &test
+              name: Test
+              image: rustlang/rust:nightly
+              caches:
+              - cargo
+              - cargo-target
+              script:
+              - curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-linux-x86_64.tar.bz2 | tar jxf -
+              - export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads"
+              - cargo test -v
+              - apt-get update && apt-get install --yes zip
+              - |
+                zip -0 ccov.zip `find . \( -name "backgammon*.gc*" \) -print`;
+                ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
+                bash <(curl -s https://codecov.io/bash) -f lcov.info;
+      - step: &sonarcloud
+              name: Build, test and analyze on SonarCloud
+              caches:
+              - sonar
+              - cargo
+              - cargo-target
+              script:
+              - pipe: sonarsource/sonarcloud-scan:1.0.1
+      - step: &check-quality-gate-sonarcloud
+              name: Check the Quality Gate on SonarCloud
+              caches:
+              - sonar
+              script:
+              - pipe: sonarsource/sonarcloud-quality-gate:0.1.3
+      - step: &deployment
+              name: Deploy to Crates
+              deployment: Crates
+              caches:
+              - cargo
+              - cargo-target
+              trigger: manual
+              script:
+              - cargo login $CARGO_TOKEN
+              - cargo publish
+
+pipelines:
+  default:
+      - step: *clippy
+      - step: *build
+      - step: *test
+  branches:
+    master:
+      - step: *clippy
+      - step: *build
+      - step: *test
+      - step: *sonarcloud
+      - step: *check-quality-gate-sonarcloud
+      - step: *deployment
+  pull-requests:
+    '**':
+      - step: *clippy
+      - step: *build
+      - step: *test
+      - step: *sonarcloud
+      - step: *check-quality-gate-sonarcloud

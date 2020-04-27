@@ -1,0 +1,21 @@
+[package]
+name = "backgammon"
+version = "0.2.0"
+authors = ["Carlo Strub <cs@carlostrub.ch>"]
+edition = "2018"
+description = "Canonical backgammon library"
+documentation = "https://docs.rs/backgammon"
+readme = "README.md"
+repository = "https://bitbucket.org/carlostrub/backgammon/src/master"
+license = "BSD-2-Clause"
+keywords = ["backgammon"]
+categories = ["game-engines", "games"]
+
+[badges]
+bitbucket-pipelines = { repository = "carlostrub/backgammon", branch = "master" }
+maintenance = { status = "actively-developed" }
+codecov = { repository = "carlostrub/backgammon", branch = "master", service = "bitbucket" }
+
+[dependencies]
+rand = "0.3.17"
+uuid = {version="0.5.1", features=["v4"]}
