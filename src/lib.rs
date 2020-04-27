@@ -7,9 +7,21 @@
 //
 //
 #![warn(future_incompatible)]
-#![deny(missing_docs)] // refuse to compile if documentation is missing
-
-extern crate uuid;
+#![deny(
+    missing_docs,
+    unused_variables,
+    missing_debug_implementations,
+    single_use_lifetimes,
+    trivial_casts,
+    trivial_numeric_casts,
+    unreachable_pub,
+    unsafe_code,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_qualifications,
+    unused_results,
+    variant_size_differences
+)] // be tough on code quality
 
 mod bg_match;
 mod cube;

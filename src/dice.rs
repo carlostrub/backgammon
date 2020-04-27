@@ -1,9 +1,7 @@
-extern crate rand;
-
 /// roll generates two random numbers between 1 and 6, replicating a perfect dice. We use the
 /// operating systems random number generator.
 fn roll() -> (u8, u8) {
-    use self::rand::{OsRng, Rng};
+    use rand::{OsRng, Rng};
     let mut rng = match OsRng::new() {
         Ok(g) => g,
         Err(e) => panic!("Failed to obtain OS RNG: {}", e),
