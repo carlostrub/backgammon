@@ -36,49 +36,13 @@ impl Default for Match {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[should_panic]
-    fn new_invalid_rules_test() {
-        let r = Rules {
-            beaver: false,
-            raccoon: true,
-            crawford: true,
-            jacoby: true,
-        };
-        let p = (Player::default(), Player::default());
-
-        New(13, p, r);
-    }
-
-    #[test]
-    #[should_panic]
-    fn new_invalid_player0_test() {
-        let r = Rules {
-            beaver: false,
-            raccoon: false,
-            crawford: false,
-            jacoby: false,
-        };
-        let p = (Player::default(), Player::default());
-
-        New(13, p, r);
-    }
-
-    #[test]
-    #[should_panic]
-    fn new_invalid_player1_test() {
-        let r = Rules {
-            beaver: false,
-            raccoon: false,
-            crawford: false,
-            jacoby: false,
-        };
-        let p = (Player::default(), Player::default());
-
-        New(13, p, r);
+/// Implements methods for the Match struct
+impl Match {
+    /// Create a new Match
+    pub fn new() -> Self {
+        Match::default()
     }
 }
+
+#[cfg(test)]
+mod tests {}

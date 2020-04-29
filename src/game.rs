@@ -102,7 +102,7 @@ mod tests {
     fn roll_test_fair() {
         let mut sum: u32 = 0;
 
-        for x in 0..10000 {
+        for _x in 0..10000 {
             let d = roll();
             sum += (d.0 + d.1) as u32;
         }

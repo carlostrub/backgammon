@@ -38,29 +38,4 @@ impl Rules {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn rules_valid_test() {
-        let d = Rules {
-            beaver: true,
-            raccoon: true,
-            crawford: true,
-            jacoby: true,
-        };
-        &d.rules_valid();
-    }
-
-    #[test]
-    #[should_panic]
-    fn rules_not_valid_test() {
-        let d = Rules {
-            beaver: false,
-            raccoon: true,
-            crawford: true,
-            jacoby: true,
-        };
-        &d.rules_valid();
-    }
-}
+mod tests {}
