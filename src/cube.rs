@@ -1,6 +1,7 @@
 use std::io;
 
 /// Rules hold different rules for the doubling cube
+#[derive(Debug)]
 pub struct Rules {
     /// When offered the cube, allow to re-double but keep it.
     pub beaver: bool,
@@ -14,13 +15,26 @@ pub struct Rules {
     pub crawford: bool,
 }
 
-/// rules_valid performs a pre-check on whether the rules selected make sense
-pub fn rules_valid(r: &Rules) -> Result<bool, io::Error> {
-    if r.raccoon && !r.beaver {
-        panic!("Raccoon rule only valid together with beaver rule.");
+impl Default for Rules {
+    fn default() -> Self {
+        Rules {
+            beaver: false,
+            raccoon: false,
+            jacoby: false,
+            crawford: false,
+        }
     }
+}
 
-    Ok(true)
+impl Rules {
+    /// rules_valid performs a pre-check on whether the rules selected make sense
+    pub fn rules_valid(&self) -> Result<bool, io::Error> {
+        if self.raccoon && !self.beaver {
+            panic!("Raccoon rule only valid together with beaver rule.");
+        }
+
+        Ok(true)
+    }
 }
 
 #[cfg(test)]
@@ -35,7 +49,7 @@ mod tests {
             crawford: true,
             jacoby: true,
         };
-        rules_valid(&d);
+        &d.rules_valid();
     }
 
     #[test]
@@ -47,6 +61,6 @@ mod tests {
             crawford: true,
             jacoby: true,
         };
-        rules_valid(&d);
+        &d.rules_valid();
     }
 }

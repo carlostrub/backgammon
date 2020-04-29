@@ -1,33 +1,65 @@
-use std::io;
+use std::fmt;
+use uuid::Uuid;
 
-/// Player holds informations about a game player.
+/// Player holds informations about a backgammon player.
+#[derive(Debug, Hash, Clone)]
 pub struct Player {
+    /// id of the player
+    pub id: Uuid,
+    /// Name of the player
     pub name: String,
 }
 
-/// player_valid performs a pre-check on whether the player selected has no missing values
-pub fn player_valid(p: &Player) -> Result<bool, io::Error> {
-    if p.name == "" {
-        panic!("No name set.");
-    }
+impl Default for Player {
+    fn default() -> Self {
+        let uuid = Uuid::new_v4();
 
-    Ok(true)
+        Player {
+            id: uuid,
+            name: "Anonymous".to_string(),
+        }
+    }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl fmt::Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
 
-    #[test]
-    fn player_valid_test() {
-        let p = Player { name: String::from("Carlo Strub") };
-        player_valid(&p);
+/// PartialEq is implemented by comparing public keys and ids
+impl PartialEq for Player {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+/// Eq is implemented using empty impl block
+impl Eq for Player {}
+
+/// Implements methods for the Player struct
+impl Player {
+    /// Return the identifier of a Player
+    pub fn id(&self) -> &Uuid {
+        &self.id
     }
 
-    #[test]
-    #[should_panic]
-    fn player_not_valid_test() {
-        let p = Player { name: String::from("") };
-        player_valid(&p);
+    /// Change the name of a player
+    pub fn with_name(self, name: String) -> Player {
+        Player { name, ..self }
+    }
+
+    /// Create a new Player
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use backgammon::Player;
+    /// let player = Player::new().with_name("Carlo Strub".to_string());
+    ///
+    /// assert_eq!(format!("This is player", player), "This is player Carlo Strub");
+    /// ```
+    pub fn new() -> Self {
+        Player::default()
     }
 }

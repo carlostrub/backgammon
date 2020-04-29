@@ -17,5 +17,5 @@ maintenance = { status = "actively-developed" }
 codecov = { repository = "carlostrub/backgammon", branch = "master", service = "bitbucket" }
 
 [dependencies]
-rand = "0.3.17"
-uuid = {version="0.5.1", features=["v4"]}
+rand = "0.7"
+uuid = { version = "0.8", features = ["v4"] }
