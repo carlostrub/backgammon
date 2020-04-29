@@ -2,7 +2,7 @@ use std::fmt;
 use uuid::Uuid;
 
 /// Player holds informations about a backgammon player.
-#[derive(Debug, Hash, Clone)]
+#[derive(Debug, Clone)]
 pub struct Player {
     /// id of the player
     pub id: Uuid,
