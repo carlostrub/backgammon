@@ -82,7 +82,7 @@ pub fn roll() -> (u8, u8) {
     let between = Uniform::new_inclusive(1, 7);
     let mut rng = rand::thread_rng();
 
-    return (between.sample(&mut rng), between.sample(&mut rng));
+    (between.sample(&mut rng), between.sample(&mut rng));
 }
 
 #[cfg(test)]
