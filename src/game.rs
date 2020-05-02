@@ -102,12 +102,12 @@ mod tests {
     fn roll_test_fair() {
         let mut sum: u32 = 0;
 
-        for _x in 0..1000000 {
+        for _x in 0..1_000_000 {
             let d = roll();
             sum += (d.0 + d.1) as u32;
         }
 
-        let average = (sum as f64) / 2000000.;
+        let average = (sum as f64) / 2_000_000.;
         assert!(average < 3.51);
         assert!(average > 3.49);
     }
