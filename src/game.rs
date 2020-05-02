@@ -79,7 +79,7 @@ impl Default for State {
 /// roll generates two random numbers between 1 and 6, replicating a perfect dice. We use the
 /// operating systems random number generator.
 pub fn roll() -> (u8, u8) {
-    let between = Uniform::new_inclusive(1, 7);
+    let between = Uniform::new_inclusive(1, 6);
     let mut rng = rand::thread_rng();
 
     (between.sample(&mut rng), between.sample(&mut rng))
@@ -102,13 +102,13 @@ mod tests {
     fn roll_test_fair() {
         let mut sum: u32 = 0;
 
-        for _x in 0..10000 {
+        for _x in 0..1000000 {
             let d = roll();
             sum += (d.0 + d.1) as u32;
         }
 
-        let average = (sum as f64) / 20000.;
-        assert!(average < 3.6);
-        assert!(average > 3.4);
+        let average = (sum as f64) / 2000000.;
+        assert!(average < 3.51);
+        assert!(average > 3.49);
     }
 }

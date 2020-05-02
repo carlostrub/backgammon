@@ -54,10 +54,10 @@ impl Player {
     /// # Example
     ///
     /// ```
-    /// use backgammon::Player;
+    /// use backgammon::player::Player;
     /// let player = Player::new().with_name("Carlo Strub".to_string());
     ///
-    /// assert_eq!(format!("This is player", player), "This is player Carlo Strub");
+    /// assert_eq!(format!("This is player {}", player), "This is player Carlo Strub");
     /// ```
     pub fn new() -> Self {
         Player::default()
