@@ -1,22 +1,10 @@
 use std::time::SystemTime;
 
-use super::cube::Rules;
-use super::game::Game;
-use super::player::Player;
+use super::Match;
+use super::Player;
+use super::Rules;
 
 use uuid::Uuid;
-
-/// Match holds informations about a match
-#[derive(Debug)]
-pub struct Match {
-    id: Uuid,
-    points: u32,
-    rules: Rules,
-    history: Vec<Game>,
-    players: (Player, Player),
-    time_start: SystemTime,
-    time_end: SystemTime,
-}
 
 impl Default for Match {
     fn default() -> Self {

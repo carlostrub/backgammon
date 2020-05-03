@@ -1,15 +1,8 @@
+use super::Player;
 use std::fmt;
 use uuid::Uuid;
 
-/// Player holds informations about a backgammon player.
-#[derive(Debug, Clone)]
-pub struct Player {
-    /// id of the player
-    pub id: Uuid,
-    /// Name of the player
-    pub name: String,
-}
-
+/// If Default is called, a new Player is generated with the Name 'Anonymous'.
 impl Default for Player {
     fn default() -> Self {
         let uuid = Uuid::new_v4();
