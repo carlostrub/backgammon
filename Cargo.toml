@@ -1,9 +1,9 @@
 [package]
 name = "backgammon"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Carlo Strub <cs@carlostrub.ch>"]
 edition = "2018"
-description = "Canonical backgammon library"
+description = "The Rust Backgammon library"
 documentation = "https://docs.rs/backgammon"
 readme = "README.md"
 repository = "https://bitbucket.org/carlostrub/backgammon/src/master"
