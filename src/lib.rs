@@ -99,7 +99,7 @@ pub struct Game {
 /// This module implements a Backgammon match
 pub mod bg_match;
 /// This module implements all Backgammon rules
-pub mod cube;
+mod cube;
 /// This module implements a Backgammon game
 pub mod game;
 /// This module implements Backgammon players
