@@ -34,7 +34,7 @@ use std::time::SystemTime;
 use uuid::Uuid;
 
 /// Player holds informations about a Backgammon player.
-#[derive(Debug, Clone, Hash)]
+#[derive(Debug, Clone)]
 pub struct Player {
     /// id of the player
     pub id: Uuid,
