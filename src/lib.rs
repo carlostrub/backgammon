@@ -1,11 +1,17 @@
-//! This is a canonical library for playeng Backgammon.
-//! Some clarifications on how we play the game:
+//! # Backgammon: The Oldest Board Game of the World
+//! This crate is a pure, canonical implementation of the game
+//! [*Backgammon*](https://en.wikipedia.org/wiki/Backgammon). It allows to
+//! implement fast Backgammon games in various clients.
 //!
-//! Players: 1) Computer, 2) Opponent
-//! Board:   is numerated from 1-24 beginning on the start point of the Computer. Opponent facing,
-//!          this is switched and visible from the API's perspective. The bar will be used on
-//!          position 25, if necessary.
+//! ## Supported Doubling Cube Rules
+//! This library supports several rules on the doubling cube:
 //!
+//! * Beaver
+//! * Raccoon
+//! * Murphy
+//! * Jacoby
+//! * Crawford
+//! * Holland
 
 #![warn(future_incompatible)]
 #![deny(
