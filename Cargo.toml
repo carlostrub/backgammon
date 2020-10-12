@@ -18,4 +18,5 @@ codecov = { repository = "carlostrub/backgammon", branch = "master", service = "
 
 [dependencies]
 rand = "0.7"
+tokio = { version = "0.2", features = ["full"] }
 uuid = { version = "0.8", features = ["v4"] }

@@ -1,9 +1,9 @@
 use rand::distributions::{Distribution, Uniform};
 
-use super::{CubeOwner, Game};
+use super::{CubeOwner, CurrentRules, Game};
 
-// Backgammon uses 25 checkers per side
-const CHECKERS: u8 = 25;
+// Backgammon uses 15 checkers per side
+const CHECKERS: u8 = 15;
 
 impl Game {
     //    fn calculate_free_positions(&mut self) {
@@ -41,13 +41,15 @@ impl Game {
 impl Default for Game {
     fn default() -> Self {
         Game {
-            points: 3,
+            points: 0,
             cube: 0,
             cube_owner: CubeOwner::Nobody,
-            one_plays: true,
+            player1_plays: true,
             board: [
                 2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0,
             ],
+            rules: CurrentRules::default(),
+            cube_received: false,
             crawford: false,
             since_crawford: 0,
         }
