@@ -49,13 +49,13 @@ definitions:
               - cargo
               - cargo-target
               script:
-              - pipe: sonarsource/sonarcloud-scan:1.0.1
+              - pipe: sonarsource/sonarcloud-scan:1.2.1
       - step: &check-quality-gate-sonarcloud
               name: Check the Quality Gate on SonarCloud
               caches:
               - sonar
               script:
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.3
+              - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
       - step: &deployment
               name: Deploy to Crates
               deployment: Crates
@@ -69,6 +69,7 @@ definitions:
 
 pipelines:
   default:
+      - step: *sonarcloud
       - step: *clippy
       - step: *build
       - step: *test
