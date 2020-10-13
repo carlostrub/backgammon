@@ -12,6 +12,22 @@
 //! * Jacoby
 //! * Crawford
 //! * Holland
+//!
+//! ## Discussions and Support
+//! Any support is very welcome. Please use the following matrix room to discuss topics around this
+//! crate: [#backgammon:carlostrub.ch](https://matrix.to/#/#backgammon:carlostrub.ch)
+//!
+//! ## Source Code Integrity
+//! All commits are signed with the following GPG key (find the respective key for example in the
+//!     [FreeBSD keyring](https://www.freebsd.org/doc/pgpkeyring.txt)):
+//!
+//! `3626 000C 0372 A78C 5DD7  B096 34EF 3FF3 3C29 811A`
+//!
+//! You can verify the integrity of the code by running:
+//!
+//! `git log --show-signature`
+//!
+//!
 
 #![warn(future_incompatible)]
 #![deny(
@@ -103,8 +119,6 @@ pub struct Game {
     // a board has 24 fields, #25 is the bar, #26 is the out of Player 1, #27 is the out of Player
     // 2
     board: [i8; 27],
-    // reference to the rules applied in the match
-    rules: CurrentRules,
     // this displays the n-th power of 2, e.g. 2 -> 2^2 = 4
     cube: u8,
     cube_owner: CubeOwner,
