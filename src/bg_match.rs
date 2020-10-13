@@ -24,7 +24,12 @@ impl Default for Match {
 
 /// Implements methods for the Match struct
 impl Match {
-    /// Create a new Match
+    /// Start a new match:
+    /// ```
+    /// use backgammon::Match
+    ///
+    /// let m = Match::new();
+    /// ```
     pub fn new() -> Self {
         Match::default()
     }
