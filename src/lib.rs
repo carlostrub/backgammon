@@ -13,6 +13,17 @@
 //! * Crawford
 //! * Holland
 //!
+//! ## Example
+//! Start a new match with rules:
+//! ```
+//! use backgammon::{Match,Rules};
+//!
+//! let mut m = Match::new().
+//! with_points(13).
+//! with_jacoby();
+//!
+//! ```
+//!
 //! ## Discussions and Support
 //! Any support is very welcome. Please use the following matrix room to discuss topics around this
 //! crate: [#backgammon:carlostrub.ch](https://matrix.to/#/#backgammon:carlostrub.ch)
@@ -26,8 +37,6 @@
 //! You can verify the integrity of the code by running:
 //!
 //! `git log --show-signature`
-//!
-//!
 
 #![warn(future_incompatible)]
 #![deny(
@@ -49,15 +58,17 @@
 use std::time::SystemTime;
 use uuid::Uuid;
 
-/// Represents one single Backgammon match
+/// Represents a Backgammon match
 #[derive(Debug)]
 pub struct Match {
     id: Uuid,
     points: u32,
+    player_points: (u32, u32),
     rules: CurrentRules,
     games: Vec<Game>,
     time_start: SystemTime,
     time_end: SystemTime,
+    player1_wins: bool,
 }
 
 /// Holds the rules of the match
@@ -117,15 +128,17 @@ pub trait Rules {
 #[derive(Debug)]
 enum CubeOwner {
     Nobody,
-    Player1,
-    Player2,
+    //   Player1,
+    // Player2,
 }
 
-/// Represents one single Backgammon game
+/// Represents a Backgammon game
 #[derive(Debug)]
 pub struct Game {
     // how many points in the game?
     points: u32,
+    // last dice pair rolled
+    dices: (u8, u8),
     // if false, player 2 plays
     player1_plays: bool,
     // a board has 24 fields, #25 is the bar, #26 is the out of Player 1, #27 is the out of Player

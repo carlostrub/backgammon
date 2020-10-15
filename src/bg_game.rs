@@ -3,9 +3,13 @@ use rand::distributions::{Distribution, Uniform};
 use super::{CubeOwner, Game};
 
 // Backgammon uses 15 checkers per side
-const CHECKERS: u8 = 15;
+//const CHECKERS: u8 = 15;
 
 impl Game {
+    /// Start a new game
+    pub fn new() -> Self {
+        Game::default()
+    }
     //    fn calculate_free_positions(&mut self) {
     //        // set free positions of computer to zero
     //        self.free_positions_computer = 0;
@@ -42,6 +46,7 @@ impl Default for Game {
     fn default() -> Self {
         Game {
             points: 0,
+            dices: (0, 0),
             cube: 0,
             cube_owner: CubeOwner::Nobody,
             player1_plays: true,

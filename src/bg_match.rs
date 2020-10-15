@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime, SystemTimeError};
 
 use super::CurrentRules;
 use super::Match;
@@ -14,17 +14,19 @@ impl Default for Match {
         Match {
             id,
             points: 0,
+            player_points: (0, 0),
             rules: CurrentRules::default(),
             games: Vec::new(),
             time_start,
             time_end: time_start,
+            player1_wins: false,
         }
     }
 }
 
 /// Implements methods for the Match struct
 impl Match {
-    /// Start a new match:
+    /// Start a new match with rules:
     /// ```
     /// use backgammon::{Match,Rules};
     ///
@@ -36,6 +38,38 @@ impl Match {
     /// ```
     pub fn new() -> Self {
         Match::default()
+    }
+
+    /// Define the points required to win the match
+    pub fn with_points(mut self, p: u32) -> Self {
+        self.points = p;
+        self
+    }
+
+    /// How many points are required to win the match
+    pub fn get_points(self) -> u32 {
+        self.points
+    }
+
+    /// Start the match
+    /// 1. dices are rolled for the first time
+    /// 2. A first game is stored
+    /// 3. Whoever may start, may do so
+    pub fn start(mut self) -> Self {
+        self.time_start = SystemTime::now();
+
+        self
+    }
+
+    /// Stop the match, also to give up
+    pub fn stop(mut self) -> Self {
+        self.time_end = SystemTime::now();
+        self
+    }
+
+    /// Display the duration of the match in Nanoseconds
+    pub fn duration(self) -> Result<Duration, SystemTimeError> {
+        self.time_end.duration_since(self.time_start)
     }
 }
 
@@ -110,27 +144,41 @@ mod tests {
     fn rule_test_murphy() {
         let m = Match::new().with_murphy(3);
 
-        assert!(m.is_murphy(), true);
+        assert!(m.is_murphy());
     }
 
     #[test]
     fn rule_test_jacoby() {
         let m = Match::new().with_jacoby();
 
-        assert!(m.is_jacoby(), true);
+        assert!(m.is_jacoby());
     }
 
     #[test]
     fn rule_test_crawford() {
         let m = Match::new().with_crawford();
 
-        assert!(m.is_crawford(), true);
+        assert!(m.is_crawford());
     }
 
     #[test]
     fn rule_test_holland() {
         let m = Match::new().with_holland();
 
-        assert!(m.is_holland(), true);
+        assert!(m.is_holland());
+    }
+
+    #[test]
+    fn match_test_points() {
+        let m = Match::new().with_points(13).with_holland();
+
+        assert!(m.get_points() == 13);
+    }
+
+    #[test]
+    fn match_test_points1() {
+        let m = Match::new().with_holland().with_points(13).with_beaver();
+
+        assert!(m.get_points() == 13);
     }
 }
