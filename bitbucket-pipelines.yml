@@ -71,7 +71,6 @@ pipelines:
   default:
       - step: *clippy
       - step: *sonarcloud
-      - step: *build
       - step: *test
   branches:
     master:
