@@ -1,15 +1,15 @@
 [package]
 name = "backgammon"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Carlo Strub <cs@carlostrub.ch>"]
 edition = "2018"
-description = "Canonical backgammon library"
+description = "The Rust Backgammon library"
 documentation = "https://docs.rs/backgammon"
 readme = "README.md"
 repository = "https://bitbucket.org/carlostrub/backgammon/src/master"
 license = "BSD-2-Clause"
 keywords = ["backgammon"]
-categories = ["game-engines", "games"]
+categories = ["games"]
 
 [badges]
 bitbucket-pipelines = { repository = "carlostrub/backgammon", branch = "master" }
@@ -18,4 +18,5 @@ codecov = { repository = "carlostrub/backgammon", branch = "master", service = "
 
 [dependencies]
 rand = "0.7"
+tokio = { version = "0.2", features = ["full"] }
 uuid = { version = "0.8", features = ["v4"] }
