@@ -43,7 +43,7 @@ definitions:
                 ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
                 bash <(curl -s https://codecov.io/bash) -f lcov.info;
       - step: &sonarcloud
-              name: Build, test and analyze on SonarCloud
+              name: SonarCloud
               caches:
               - sonar
               - cargo
@@ -51,7 +51,7 @@ definitions:
               script:
               - pipe: sonarsource/sonarcloud-scan:1.2.1
       - step: &check-quality-gate-sonarcloud
-              name: Check the Quality Gate on SonarCloud
+              name: SonarCloud Quality Gate
               caches:
               - sonar
               script:
@@ -69,8 +69,8 @@ definitions:
 
 pipelines:
   default:
-      - step: *sonarcloud
       - step: *clippy
+      - step: *sonarcloud
       - step: *build
       - step: *test
   branches:
