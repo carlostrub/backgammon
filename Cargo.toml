@@ -1,6 +1,6 @@
 [package]
 name = "backgammon"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Carlo Strub <cs@carlostrub.ch>"]
 edition = "2018"
 description = "The Rust Backgammon library"
@@ -9,7 +9,7 @@ readme = "README.md"
 repository = "https://bitbucket.org/carlostrub/backgammon/src/master"
 license = "BSD-2-Clause"
 keywords = ["backgammon"]
-categories = ["game-engines", "games"]
+categories = ["games"]
 
 [badges]
 bitbucket-pipelines = { repository = "carlostrub/backgammon", branch = "master" }
