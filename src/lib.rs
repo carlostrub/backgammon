@@ -86,19 +86,31 @@ struct CurrentRules {
 pub trait Rules {
     /// When offered the cube, allow to re-double but keep it.
     fn with_beaver(self) -> Self;
+    /// Return true if beaver rule is set
+    fn is_beaver(self) -> bool;
     /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
     fn with_raccoon(self) -> Self;
+    /// Return true if Raccoon rule is set
+    fn is_raccoon(self) -> bool;
     /// If both players roll the same opening number, the dice is doubled, remaining in the middle
     /// of the board
     fn with_murphy(self, limit: u8) -> Self;
+    /// Return true if Murphy rule is set
+    fn is_murphy(self) -> bool;
     /// Gammon and Backgammon only count for double or triple values if the cube has already been
     /// offered.
     fn with_jacoby(self) -> Self;
+    /// Return true if Jacoby rule is set
+    fn is_jacoby(self) -> bool;
     /// When a player first reaches a score of points - 1, no doubling is allowed for the following
     /// game.
     fn with_crawford(self) -> Self;
+    /// Return true if Crawford rule is set
+    fn is_crawford(self) -> bool;
     /// Permits to double after Crawford game only if both players have rolled at least twice
     fn with_holland(self) -> Self;
+    /// Return true if Holland rule is set
+    fn is_holland(self) -> bool;
 }
 
 /// Cube can be owned by Nobody, Player 1, or Player 2

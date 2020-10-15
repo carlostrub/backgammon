@@ -22,6 +22,9 @@ impl Rules for CurrentRules {
             ..self
         }
     }
+    fn is_beaver(self) -> bool {
+        self.beaver
+    }
 
     fn with_raccoon(self) -> Self {
         CurrentRules {
@@ -29,6 +32,9 @@ impl Rules for CurrentRules {
             raccoon: true,
             ..self
         }
+    }
+    fn is_raccoon(self) -> bool {
+        self.raccoon
     }
 
     fn with_murphy(self, limit: u8) -> Self {
@@ -38,12 +44,18 @@ impl Rules for CurrentRules {
             ..self
         }
     }
+    fn is_murphy(self) -> bool {
+        self.murphy
+    }
 
     fn with_jacoby(self) -> Self {
         CurrentRules {
             jacoby: true,
             ..self
         }
+    }
+    fn is_jacoby(self) -> bool {
+        self.jacoby
     }
 
     fn with_crawford(self) -> Self {
@@ -52,6 +64,9 @@ impl Rules for CurrentRules {
             ..self
         }
     }
+    fn is_crawford(self) -> bool {
+        self.crawford
+    }
 
     fn with_holland(self) -> Self {
         CurrentRules {
@@ -59,5 +74,8 @@ impl Rules for CurrentRules {
             holland: true,
             ..self
         }
+    }
+    fn is_holland(self) -> bool {
+        self.holland
     }
 }

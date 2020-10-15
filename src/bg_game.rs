@@ -1,6 +1,6 @@
 use rand::distributions::{Distribution, Uniform};
 
-use super::{CubeOwner, CurrentRules, Game};
+use super::{CubeOwner, Game};
 
 // Backgammon uses 15 checkers per side
 const CHECKERS: u8 = 15;
@@ -48,7 +48,6 @@ impl Default for Game {
             board: [
                 2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0,
             ],
-            rules: CurrentRules::default(),
             cube_received: false,
             crawford: false,
             since_crawford: 0,

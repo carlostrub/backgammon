@@ -26,9 +26,13 @@ impl Default for Match {
 impl Match {
     /// Start a new match:
     /// ```
-    /// use backgammon::Match
+    /// use backgammon::{Match,Rules};
     ///
-    /// let m = Match::new();
+    /// let m = Match::new().
+    /// with_raccoon().
+    /// with_jacoby();
+    ///
+    /// # assert!(m.is_beaver(),true);
     /// ```
     pub fn new() -> Self {
         Match::default()
@@ -42,12 +46,18 @@ impl Rules for Match {
             ..self
         }
     }
+    fn is_beaver(self) -> bool {
+        self.rules.is_beaver()
+    }
 
     fn with_raccoon(self) -> Self {
         Match {
             rules: self.rules.with_raccoon(),
             ..self
         }
+    }
+    fn is_raccoon(self) -> bool {
+        self.rules.is_raccoon()
     }
 
     fn with_murphy(self, limit: u8) -> Self {
@@ -56,12 +66,18 @@ impl Rules for Match {
             ..self
         }
     }
+    fn is_murphy(self) -> bool {
+        self.rules.is_murphy()
+    }
 
     fn with_jacoby(self) -> Self {
         Match {
             rules: self.rules.with_jacoby(),
             ..self
         }
+    }
+    fn is_jacoby(self) -> bool {
+        self.rules.is_jacoby()
     }
 
     fn with_crawford(self) -> Self {
@@ -70,6 +86,9 @@ impl Rules for Match {
             ..self
         }
     }
+    fn is_crawford(self) -> bool {
+        self.rules.is_crawford()
+    }
 
     fn with_holland(self) -> Self {
         Match {
@@ -77,7 +96,41 @@ impl Rules for Match {
             ..self
         }
     }
+    fn is_holland(self) -> bool {
+        self.rules.is_holland()
+    }
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn rule_test_murphy() {
+        let m = Match::new().with_murphy(3);
+
+        assert!(m.is_murphy(), true);
+    }
+
+    #[test]
+    fn rule_test_jacoby() {
+        let m = Match::new().with_jacoby();
+
+        assert!(m.is_jacoby(), true);
+    }
+
+    #[test]
+    fn rule_test_crawford() {
+        let m = Match::new().with_crawford();
+
+        assert!(m.is_crawford(), true);
+    }
+
+    #[test]
+    fn rule_test_holland() {
+        let m = Match::new().with_holland();
+
+        assert!(m.is_holland(), true);
+    }
+}
