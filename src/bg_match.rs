@@ -26,15 +26,14 @@ impl Default for Match {
 
 /// Implements methods for the Match struct
 impl Match {
-    /// Start a new match with rules:
+    /// Start a new match:
     /// ```
-    /// use backgammon::{Match,Rules};
+    /// use backgammon::Match;
     ///
-    /// let m = Match::new().
-    /// with_raccoon().
-    /// with_jacoby();
+    /// let m = Match::new();
     ///
-    /// # assert!(m.is_beaver(),true);
+    /// # use backgammon::Rules;
+    /// # assert!(m.is_crawford(),true);
     /// ```
     pub fn new() -> Self {
         Match::default()

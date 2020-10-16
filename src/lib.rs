@@ -173,7 +173,7 @@ mod tests {
 
         assert_eq!(
             format!("The match rules are: {:?}", m.rules),
-            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: false, holland: false }"
+            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: true, holland: false }"
         );
     }
 
@@ -183,7 +183,7 @@ mod tests {
 
         assert_eq!(
             format!("The match rules are: {:?}", r),
-            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: false, holland: false }"
+            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: true, holland: false }"
         );
     }
 
