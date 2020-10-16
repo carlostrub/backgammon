@@ -1,4 +1,4 @@
-# Backgammon: The Oldest Board Game of the World [![](https://img.shields.io/crates/v/backgammon.svg)](https://crates.io/crates/backgammon) [![](https://docs.rs/backgammon/badge.svg)](https://docs.rs/backgammon) [![](https://img.shields.io/badge/License-BSD-brightgreen)](https://bitbucket.org/carlostrub/backgammon/src/develop/COPYRIGHT)
+# Backgammon: The Oldest Board Game of the World [![](https://img.shields.io/crates/v/backgammon.svg)](https://crates.io/crates/backgammon) [![](https://badgen.net/codecov/c/bitbucket/carlostrub/backgammon)]() [![](https://docs.rs/backgammon/badge.svg)](https://docs.rs/backgammon) [![](https://img.shields.io/badge/License-BSD-brightgreen)](https://bitbucket.org/carlostrub/backgammon/src/develop/COPYRIGHT)
 This crate is a pure, canonical implementation of the game
 [*Backgammon*](https://en.wikipedia.org/wiki/Backgammon). It allows to
 implement fast Backgammon games in various clients.
