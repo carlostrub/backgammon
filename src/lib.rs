@@ -160,3 +160,48 @@ pub mod bg_game;
 pub mod bg_match;
 /// Implements all Backgammon rules
 mod bg_rules;
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn debug_match() {
+        let m = Match::new().with_jacoby();
+
+        assert_eq!(
+            format!("The match rules are: {:?}", m.rules),
+            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: false, holland: false }"
+        );
+    }
+
+    #[test]
+    fn debug_current_rules() {
+        let r = CurrentRules::default().with_jacoby();
+
+        assert_eq!(
+            format!("The match rules are: {:?}", r),
+            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: false, holland: false }"
+        );
+    }
+
+    #[test]
+    fn debug_cubeowner() {
+        let o = CubeOwner::Nobody;
+
+        assert_eq!(
+            format!("The cube is owned by: {:?}", o),
+            "The cube is owned by: Nobody"
+        );
+    }
+    #[test]
+    fn debug_game() {
+        let g = Game::default();
+
+        assert_eq!(
+            format!("The game is: {:?}", g),
+            "The game is: Game { points: 0, dices: (0, 0), player1_plays: true, board: [2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0], cube: 0, cube_owner: Nobody, cube_received: false, crawford: false, since_crawford: 0 }"
+        );
+    }
+}

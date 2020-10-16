@@ -148,6 +148,13 @@ mod tests {
     }
 
     #[test]
+    fn rule_test_raccoon() {
+        let m = Match::new().with_raccoon();
+
+        assert!(m.is_raccoon());
+    }
+
+    #[test]
     fn rule_test_jacoby() {
         let m = Match::new().with_jacoby();
 
