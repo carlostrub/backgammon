@@ -73,19 +73,15 @@ definitions:
 pipelines:
   default:
       - step: *clippy
-      - step: *sonarcloud
       - step: *test
   branches:
     master:
       - step: *clippy
       - step: *build
       - step: *test
-      - step: *check-quality-gate-sonarcloud
       - step: *deployment
   pull-requests:
     '**':
       - step: *clippy
       - step: *build
       - step: *test
-      - step: *sonarcloud
-      - step: *check-quality-gate-sonarcloud
