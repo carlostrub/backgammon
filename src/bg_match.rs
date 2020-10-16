@@ -13,7 +13,7 @@ impl Default for Match {
 
         Match {
             id,
-            points: 0,
+            points: 3,
             player_points: (0, 0),
             rules: CurrentRules::default(),
             games: Vec::new(),

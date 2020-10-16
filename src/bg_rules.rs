@@ -9,7 +9,7 @@ impl Default for CurrentRules {
             murphy: false,
             murphy_limit: 0,
             jacoby: false,
-            crawford: false,
+            crawford: true,
             holland: false,
         }
     }
