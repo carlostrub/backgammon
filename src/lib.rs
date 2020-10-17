@@ -68,7 +68,7 @@ pub struct Match {
     games: Vec<Game>,
     time_start: SystemTime,
     time_end: SystemTime,
-    player1_wins: bool,
+    winner: Player,
 }
 
 /// Holds the rules of the match
@@ -124,9 +124,9 @@ pub trait Rules {
     fn is_holland(self) -> bool;
 }
 
-/// Cube can be owned by Nobody, Player 1, or Player 2
+/// This enum is used in several places, e.g. for cube ownership or for winner
 #[derive(Debug)]
-enum CubeOwner {
+enum Player {
     Nobody,
     //   Player1,
     // Player2,
@@ -139,14 +139,14 @@ pub struct Game {
     points: u32,
     // last dice pair rolled
     dices: (u8, u8),
-    // if false, player 2 plays
-    player1_plays: bool,
+    // whose turn is it?
+    who_plays: Player,
     // a board has 24 fields, #25 is the bar, #26 is the out of Player 1, #27 is the out of Player
     // 2
     board: [i8; 27],
     // this displays the n-th power of 2, e.g. 2 -> 2^2 = 4
     cube: u8,
-    cube_owner: CubeOwner,
+    cube_owner: Player,
     cube_received: bool,
     // Crawford rule: if crawford game, no doubling allowed
     crawford: bool,
@@ -188,7 +188,7 @@ mod tests {
 
     #[test]
     fn debug_cubeowner() {
-        let o = CubeOwner::Nobody;
+        let o = Player::Nobody;
 
         assert_eq!(
             format!("The cube is owned by: {:?}", o),
@@ -201,7 +201,7 @@ mod tests {
 
         assert_eq!(
             format!("The game is: {:?}", g),
-            "The game is: Game { points: 0, dices: (0, 0), player1_plays: true, board: [2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0], cube: 0, cube_owner: Nobody, cube_received: false, crawford: false, since_crawford: 0 }"
+            "The game is: Game { points: 0, dices: (0, 0), who_plays: Nobody, board: [2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0], cube: 0, cube_owner: Nobody, cube_received: false, crawford: false, since_crawford: 0 }"
         );
     }
 }

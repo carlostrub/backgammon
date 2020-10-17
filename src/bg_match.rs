@@ -2,6 +2,7 @@ use std::time::{Duration, SystemTime, SystemTimeError};
 
 use super::CurrentRules;
 use super::Match;
+use super::Player;
 use super::Rules;
 
 use uuid::Uuid;
@@ -19,7 +20,7 @@ impl Default for Match {
             games: Vec::new(),
             time_start,
             time_end: time_start,
-            player1_wins: false,
+            winner: Player::Nobody,
         }
     }
 }
