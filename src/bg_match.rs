@@ -176,6 +176,13 @@ mod tests {
     }
 
     #[test]
+    fn rule_test_beaver() {
+        let m = Match::new().with_beaver();
+
+        assert!(&m.is_beaver());
+    }
+
+    #[test]
     fn match_test_points() {
         let m = Match::new().with_points(13).with_holland();
 
