@@ -30,7 +30,7 @@
 //!
 //! ## Source Code Integrity
 //! All commits are signed with the following GPG key (find the respective key for example in the
-//!     [FreeBSD keyring](https://www.freebsd.org/doc/pgpkeyring.txt)):
+//!     [FreeBSD keyring](https://docs.freebsd.org/pgpkeys/pgpkeys.txt)):
 //!
 //! `59A6 2B5D B2FE B9CA 2358  4FA1 1C7A 2F39 D966 052B`
 //!
