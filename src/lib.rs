@@ -25,8 +25,9 @@
 //! ```
 //!
 //! ## Discussions and Support
-//! Any support is very welcome. Please use the following matrix room to discuss topics around this
-//! crate: [#backgammon:carlostrub.ch](https://matrix.to/#/#backgammon:carlostrub.ch)
+//! Any support is very welcome. Please use [Bitbucket
+//! Issues](https://bitbucket.org/carlostrub/backgammon/issues?status=new&status=open) to discuss
+//! features or ask for help.
 //!
 //! ## Source Code Integrity
 //! All commits are signed with the following GPG key (find the respective key for example in the
