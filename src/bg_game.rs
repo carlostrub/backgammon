@@ -1,6 +1,6 @@
 use rand::distributions::{Distribution, Uniform};
 
-use super::{Game, Player};
+use super::{Game, Player, Statistics};
 
 // Backgammon uses 15 checkers per side
 //const CHECKERS: u8 = 15;
@@ -10,6 +10,38 @@ impl Game {
     pub fn new() -> Self {
         Game::default()
     }
+
+    /// roll generates two random numbers between 1 and 6, replicating a perfect dice. We use the
+    /// operating systems random number generator.
+    pub fn roll(&mut self) {
+        let between = Uniform::new_inclusive(1, 6);
+        let mut rng = rand::thread_rng();
+
+        self.dices = (between.sample(&mut rng), between.sample(&mut rng))
+    }
+
+    /// start game by rolling a pair of different numbers to define who begins
+    pub fn start(mut self) -> Result<Self, &'static str> {
+        match self.who_plays {
+            Player::Nobody => {
+                loop {
+                    self.roll();
+                    if self.dices.0 != self.dices.1 {
+                        break;
+                    };
+                }
+                if self.dices.0 > self.dices.1 {
+                    self.who_plays = Player::Player1;
+                } else {
+                    self.who_plays = Player::Player2;
+                }
+                Ok(self)
+            }
+            Player::Player1 => Err("game already running"),
+            Player::Player2 => Err("game already running"),
+        }
+    }
+
     //    fn calculate_free_positions(&mut self) {
     //        // set free positions of computer to zero
     //        self.free_positions_computer = 0;
@@ -46,27 +78,24 @@ impl Default for Game {
     fn default() -> Self {
         Game {
             points: 0,
+            winner: Player::Nobody,
             dices: (0, 0),
             cube: 0,
             cube_owner: Player::Nobody,
             who_plays: Player::Nobody,
-            board: [
-                2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0,
-            ],
+            board: (
+                [
+                    2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2,
+                ],
+                (0, 0),
+                (0, 0),
+            ),
             cube_received: false,
             crawford: false,
             since_crawford: 0,
+            statistics: Statistics::default(),
         }
     }
-}
-
-/// roll generates two random numbers between 1 and 6, replicating a perfect dice. We use the
-/// operating systems random number generator.
-pub fn roll() -> (u8, u8) {
-    let between = Uniform::new_inclusive(1, 6);
-    let mut rng = rand::thread_rng();
-
-    (between.sample(&mut rng), between.sample(&mut rng))
 }
 
 #[cfg(test)]

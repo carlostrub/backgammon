@@ -1,26 +1,16 @@
-use std::time::{Duration, SystemTime, SystemTimeError};
+use super::{CurrentRules, Match, Rules, Statistics};
 
-use super::CurrentRules;
-use super::Match;
-use super::Player;
-use super::Rules;
-
+use std::time::{Duration, SystemTimeError};
 use uuid::Uuid;
 
 impl Default for Match {
     fn default() -> Self {
-        let id = Uuid::new_v4();
-        let time_start = SystemTime::now();
-
         Match {
-            id,
+            id: Uuid::new_v4(),
             points: 3,
-            player_points: (0, 0),
             rules: CurrentRules::default(),
             games: Vec::new(),
-            time_start,
-            time_end: time_start,
-            winner: Player::Nobody,
+            statistics: Statistics::default(),
         }
     }
 }
@@ -47,7 +37,7 @@ impl Match {
     }
 
     /// How many points are required to win the match
-    pub fn get_points(self) -> u32 {
+    pub fn get_points(&self) -> u32 {
         self.points
     }
 
@@ -56,20 +46,22 @@ impl Match {
     /// 2. A first game is stored
     /// 3. Whoever may start, may do so
     pub fn start(mut self) -> Self {
-        self.time_start = SystemTime::now();
+        self.statistics = Statistics::default();
 
         self
     }
 
-    /// Stop the match, also to give up
+    /// Stop the match
+    /// 1. Winner is assigned based on current points
     pub fn stop(mut self) -> Self {
-        self.time_end = SystemTime::now();
+        // TODO: the winner needs to be declared, etc.
+        self.statistics.stop();
         self
     }
 
-    /// Display the duration of the match in Nanoseconds
-    pub fn duration(self) -> Result<Duration, SystemTimeError> {
-        self.time_end.duration_since(self.time_start)
+    /// Duration of this match
+    pub fn duration(&self) -> Result<Duration, SystemTimeError> {
+        self.statistics.duration()
     }
 }
 

@@ -64,12 +64,9 @@ use uuid::Uuid;
 pub struct Match {
     id: Uuid,
     points: u32,
-    player_points: (u32, u32),
     rules: CurrentRules,
     games: Vec<Game>,
-    time_start: SystemTime,
-    time_end: SystemTime,
-    winner: Player,
+    statistics: Statistics,
 }
 
 /// Holds the rules of the match
@@ -92,6 +89,15 @@ struct CurrentRules {
     crawford: bool,
     /// Permits to double after Crawford game only if both players have rolled at least twice
     holland: bool,
+}
+
+/// Holds various statistical information about a Match or a Game
+#[derive(Debug)]
+struct Statistics {
+    /// start time
+    time_start: SystemTime,
+    /// End time
+    time_end: SystemTime,
 }
 
 /// Implements the Backgammon rules
@@ -129,8 +135,8 @@ pub trait Rules {
 #[derive(Debug)]
 enum Player {
     Nobody,
-    //   Player1,
-    // Player2,
+    Player1,
+    Player2,
 }
 
 /// Represents a Backgammon game
@@ -138,14 +144,16 @@ enum Player {
 pub struct Game {
     // how many points in the game?
     points: u32,
+    // who is the winner?
+    winner: Player,
     // last dice pair rolled
     dices: (u8, u8),
     // whose turn is it?
     who_plays: Player,
-    // a board has 24 fields, #25 is the bar, #26 is the out of Player 1, #27 is the out of Player
-    // 2
-    board: [i8; 27],
-    // this displays the n-th power of 2, e.g. 2 -> 2^2 = 4
+    // a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
+    // the off for Player 1 and 2
+    board: ([i8; 24], (u8, u8), (u8, u8)),
+    // cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
     cube: u8,
     cube_owner: Player,
     cube_received: bool,
@@ -153,14 +161,18 @@ pub struct Game {
     crawford: bool,
     // Holland rule: if <4 rolls of crawford game, no doubling allowed
     since_crawford: u8,
+    // Gather statistical information
+    statistics: Statistics,
 }
 
 /// Implements a Backgammon game
-pub mod bg_game;
+mod bg_game;
 /// Implements a Backgammon match
-pub mod bg_match;
+mod bg_match;
 /// Implements all Backgammon rules
 mod bg_rules;
+/// Implements certain Backgammon statistics
+mod bg_statistics;
 
 #[cfg(test)]
 mod tests {
