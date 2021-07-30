@@ -1,6 +1,6 @@
 use rand::distributions::{Distribution, Uniform};
 
-use super::{Game, Player, Statistics};
+use super::{Error, Game, Player, Statistics};
 
 // Backgammon uses 15 checkers per side
 //const CHECKERS: u8 = 15;
@@ -11,34 +11,41 @@ impl Game {
         Game::default()
     }
 
-    /// roll generates two random numbers between 1 and 6, replicating a perfect dice. We use the
-    /// operating systems random number generator.
-    pub fn roll(&mut self) {
+    /// Roll the dices which generates two random numbers between 1 and 6, replicating a perfect
+    /// dice. We use the operating systems random number generator.
+    pub fn roll(mut self, p: Player) -> Result<Self, Error> {
         let between = Uniform::new_inclusive(1, 6);
         let mut rng = rand::thread_rng();
 
-        self.dices = (between.sample(&mut rng), between.sample(&mut rng))
+        match self.who_plays != p {
+            true => Err(Error::TurnError),
+            false => match self.cube_received {
+                true => Err(Error::DiceReceivedError),
+                false => {
+                    self.dices = (between.sample(&mut rng), between.sample(&mut rng));
+                    Ok(self)
+                }
+            },
+        }
     }
 
-    /// start game by rolling a pair of different numbers to define who begins
-    pub fn start(mut self) -> Result<Self, &'static str> {
-        match self.who_plays {
-            Player::Nobody => {
-                loop {
-                    self.roll();
-                    if self.dices.0 != self.dices.1 {
-                        break;
-                    };
+    /// Start game by rolling a pair of different numbers to define who begins.
+    pub fn start(self) -> Result<Self, Error> {
+        loop {
+            let g = self.roll(Player::Nobody);
+            match g {
+                Ok(mut game) => {
+                    if &game.dices.0 != &game.dices.1 {
+                        if &game.dices.0 > &game.dices.1 {
+                            game.who_plays = Player::Player1;
+                        } else {
+                            game.who_plays = Player::Player2;
+                        }
+                    }
+                    return Ok(game);
                 }
-                if self.dices.0 > self.dices.1 {
-                    self.who_plays = Player::Player1;
-                } else {
-                    self.who_plays = Player::Player2;
-                }
-                Ok(self)
+                Err(_) => return Err(Error::StartedError),
             }
-            Player::Player1 => Err("game already running"),
-            Player::Player2 => Err("game already running"),
         }
     }
 

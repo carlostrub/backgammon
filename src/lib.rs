@@ -56,6 +56,7 @@
     variant_size_differences
 )] // be tough on code quality
 
+use std::fmt;
 use std::time::SystemTime;
 use uuid::Uuid;
 
@@ -131,32 +132,70 @@ pub trait Rules {
     fn is_holland(&self) -> bool;
 }
 
-/// This enum is used in several places, e.g. for cube ownership or for winner
+/// Backgammon defines certain errors
 #[derive(Debug)]
-enum Player {
+pub enum Error {
+    /// Game has already started
+    StartedError,
+    /// Game has already ended
+    EndedError,
+    /// Opponent is playing
+    TurnError,
+    /// Opponent offered dice. Need to react on this event first.
+    DiceReceivedError,
+    /// Doubling not permitted
+    DoubleError,
+}
+impl std::error::Error for Error {}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Error::StartedError => write!(f, "Game has already started"),
+            Error::EndedError => write!(f, "Game has already ended"),
+            Error::TurnError => write!(f, "Opponent is playing"),
+            Error::DiceReceivedError => {
+                write!(
+                    f,
+                    "Opponent offered dice. Need to react on this event first."
+                )
+            }
+            Error::DoubleError => write!(f, "Doubling not permitted"),
+        }
+    }
+}
+
+/// This enum is used in several places, e.g. for cube ownership or for winner
+#[derive(Debug, PartialEq)]
+pub enum Player {
+    /// none of the two players, e.g. at start
     Nobody,
+    /// Player 1
     Player1,
+    /// Player 2
     Player2,
 }
 
 /// Represents a Backgammon game
 #[derive(Debug)]
 pub struct Game {
-    // how many points in the game?
-    points: u32,
-    // who is the winner?
-    winner: Player,
-    // last dice pair rolled
-    dices: (u8, u8),
-    // whose turn is it?
-    who_plays: Player,
-    // a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
-    // the off for Player 1 and 2
-    board: ([i8; 24], (u8, u8), (u8, u8)),
-    // cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
-    cube: u8,
-    cube_owner: Player,
-    cube_received: bool,
+    /// how many points in the game?
+    pub points: u32,
+    /// who is the winner?
+    pub winner: Player,
+    /// last dice pair rolled
+    pub dices: (u8, u8),
+    /// whose turn is it?
+    pub who_plays: Player,
+    /// a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
+    /// the off for Player 1 and 2
+    pub board: ([i8; 24], (u8, u8), (u8, u8)),
+    /// cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
+    pub cube: u8,
+    /// who holds the cube
+    pub cube_owner: Player,
+    /// was cube offered to the one who plays?
+    pub cube_received: bool,
     // Crawford rule: if crawford game, no doubling allowed
     crawford: bool,
     // Holland rule: if <4 rolls of crawford game, no doubling allowed
