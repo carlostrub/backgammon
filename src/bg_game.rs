@@ -35,8 +35,8 @@ impl Game {
             let g = self.roll(Player::Nobody);
             match g {
                 Ok(mut g) => {
-                    if &g.dices.0 != &g.dices.1 {
-                        if &g.dices.0 > &g.dices.1 {
+                    if g.dices.0 != g.dices.1 {
+                        if g.dices.0 > g.dices.1 {
                             g.who_plays = Player::Player1;
                         } else {
                             g.who_plays = Player::Player2;
