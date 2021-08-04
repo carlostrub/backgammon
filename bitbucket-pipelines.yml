@@ -50,8 +50,11 @@ definitions:
               - cargo-target
               script:
               - pipe: sonarsource/sonarcloud-scan:1.2.1
+                variables:
+                SONAR_TOKEN: ${SONAR_TOKEN}
+                EXTRA_ARGS: '-Dsonar.projectKey=backgammon -Dsonar.sources=src -Dsonar.tests=src'
       - step: &check-quality-gate-sonarcloud
-              name: SonarCloud Quality Gate
+              name: Quality Gate
               caches:
               - sonar
               script:
@@ -70,21 +73,15 @@ definitions:
 pipelines:
   default:
       - step: *clippy
-      - step: *sonarcloud
-      - step: *build
       - step: *test
   branches:
     master:
       - step: *clippy
       - step: *build
       - step: *test
-      - step: *sonarcloud
-      - step: *check-quality-gate-sonarcloud
       - step: *deployment
   pull-requests:
     '**':
       - step: *clippy
       - step: *build
       - step: *test
-      - step: *sonarcloud
-      - step: *check-quality-gate-sonarcloud

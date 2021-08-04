@@ -25,14 +25,15 @@
 //! ```
 //!
 //! ## Discussions and Support
-//! Any support is very welcome. Please use the following matrix room to discuss topics around this
-//! crate: [#backgammon:carlostrub.ch](https://matrix.to/#/#backgammon:carlostrub.ch)
+//! Any support is very welcome. Please use [Bitbucket
+//! Issues](https://bitbucket.org/carlostrub/backgammon/issues?status=new&status=open) to discuss
+//! features or ask for help.
 //!
 //! ## Source Code Integrity
 //! All commits are signed with the following GPG key (find the respective key for example in the
-//!     [FreeBSD keyring](https://www.freebsd.org/doc/pgpkeyring.txt)):
+//!     [FreeBSD keyring](https://docs.freebsd.org/pgpkeys/pgpkeys.txt)):
 //!
-//! `3626 000C 0372 A78C 5DD7  B096 34EF 3FF3 3C29 811A`
+//! `59A6 2B5D B2FE B9CA 2358  4FA1 1C7A 2F39 D966 052B`
 //!
 //! You can verify the integrity of the code by running:
 //!
@@ -55,6 +56,7 @@
     variant_size_differences
 )] // be tough on code quality
 
+use std::fmt;
 use std::time::SystemTime;
 use uuid::Uuid;
 
@@ -63,12 +65,9 @@ use uuid::Uuid;
 pub struct Match {
     id: Uuid,
     points: u32,
-    player_points: (u32, u32),
     rules: CurrentRules,
     games: Vec<Game>,
-    time_start: SystemTime,
-    time_end: SystemTime,
-    player1_wins: bool,
+    statistics: Statistics,
 }
 
 /// Holds the rules of the match
@@ -93,70 +92,169 @@ struct CurrentRules {
     holland: bool,
 }
 
+/// Holds various statistical information about a Match or a Game
+#[derive(Debug, Clone, Copy)]
+struct Statistics {
+    /// start time
+    time_start: SystemTime,
+    /// End time
+    time_end: SystemTime,
+}
+
 /// Implements the Backgammon rules
 pub trait Rules {
     /// When offered the cube, allow to re-double but keep it.
     fn with_beaver(self) -> Self;
     /// Return true if beaver rule is set
-    fn is_beaver(self) -> bool;
+    fn is_beaver(&self) -> bool;
     /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
     fn with_raccoon(self) -> Self;
     /// Return true if Raccoon rule is set
-    fn is_raccoon(self) -> bool;
+    fn is_raccoon(&self) -> bool;
     /// If both players roll the same opening number, the dice is doubled, remaining in the middle
     /// of the board
     fn with_murphy(self, limit: u8) -> Self;
     /// Return true if Murphy rule is set
-    fn is_murphy(self) -> bool;
+    fn is_murphy(&self) -> bool;
     /// Gammon and Backgammon only count for double or triple values if the cube has already been
     /// offered.
     fn with_jacoby(self) -> Self;
     /// Return true if Jacoby rule is set
-    fn is_jacoby(self) -> bool;
+    fn is_jacoby(&self) -> bool;
     /// When a player first reaches a score of points - 1, no doubling is allowed for the following
     /// game.
     fn with_crawford(self) -> Self;
     /// Return true if Crawford rule is set
-    fn is_crawford(self) -> bool;
+    fn is_crawford(&self) -> bool;
     /// Permits to double after Crawford game only if both players have rolled at least twice
     fn with_holland(self) -> Self;
     /// Return true if Holland rule is set
-    fn is_holland(self) -> bool;
+    fn is_holland(&self) -> bool;
 }
 
-/// Cube can be owned by Nobody, Player 1, or Player 2
+/// Backgammon defines certain errors
 #[derive(Debug)]
-enum CubeOwner {
+pub enum Error {
+    /// Game has already started
+    StartedError,
+    /// Game has already ended
+    EndedError,
+    /// Opponent is playing
+    TurnError,
+    /// Opponent offered dice. Need to react on this event first.
+    DiceReceivedError,
+    /// Doubling not permitted
+    DoubleError,
+}
+impl std::error::Error for Error {}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Error::StartedError => write!(f, "Game has already started"),
+            Error::EndedError => write!(f, "Game has already ended"),
+            Error::TurnError => write!(f, "Opponent is playing"),
+            Error::DiceReceivedError => {
+                write!(
+                    f,
+                    "Opponent offered dice. Need to react on this event first."
+                )
+            }
+            Error::DoubleError => write!(f, "Doubling not permitted"),
+        }
+    }
+}
+
+/// This enum is used in several places, e.g. for cube ownership or for winner
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum Player {
+    /// none of the two players, e.g. at start
     Nobody,
-    //   Player1,
-    // Player2,
+    /// Player 1
+    Player1,
+    /// Player 2
+    Player2,
 }
 
 /// Represents a Backgammon game
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Game {
-    // how many points in the game?
-    points: u32,
-    // last dice pair rolled
-    dices: (u8, u8),
-    // if false, player 2 plays
-    player1_plays: bool,
-    // a board has 24 fields, #25 is the bar, #26 is the out of Player 1, #27 is the out of Player
-    // 2
-    board: [i8; 27],
-    // this displays the n-th power of 2, e.g. 2 -> 2^2 = 4
-    cube: u8,
-    cube_owner: CubeOwner,
-    cube_received: bool,
+    /// how many points in the game?
+    pub points: u32,
+    /// who is the winner?
+    pub winner: Player,
+    /// last dice pair rolled
+    pub dices: (u8, u8),
+    /// whose turn is it?
+    pub who_plays: Player,
+    /// a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
+    /// the off for Player 1 and 2
+    pub board: ([i8; 24], (u8, u8), (u8, u8)),
+    /// cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
+    pub cube: u8,
+    /// who holds the cube
+    pub cube_owner: Player,
+    /// was cube offered to the one who plays?
+    pub cube_received: bool,
     // Crawford rule: if crawford game, no doubling allowed
     crawford: bool,
     // Holland rule: if <4 rolls of crawford game, no doubling allowed
     since_crawford: u8,
+    // Gather statistical information
+    statistics: Statistics,
 }
 
 /// Implements a Backgammon game
-pub mod bg_game;
+mod bg_game;
 /// Implements a Backgammon match
-pub mod bg_match;
+mod bg_match;
 /// Implements all Backgammon rules
 mod bg_rules;
+/// Implements certain Backgammon statistics
+mod bg_statistics;
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn debug_match() {
+        let m = Match::new().with_jacoby();
+
+        assert_eq!(
+            format!("The match rules are: {:?}", m.rules),
+            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: true, holland: false }"
+        );
+    }
+
+    #[test]
+    fn debug_current_rules() {
+        let r = CurrentRules::default().with_jacoby();
+
+        assert_eq!(
+            format!("The match rules are: {:?}", r),
+            "The match rules are: CurrentRules { beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: true, crawford: true, holland: false }"
+        );
+    }
+
+    #[test]
+    fn debug_cubeowner() {
+        let o = Player::Nobody;
+
+        assert_eq!(
+            format!("The cube is owned by: {:?}", o),
+            "The cube is owned by: Nobody"
+        );
+    }
+    #[test]
+    fn debug_game() {
+        let g = Game::default();
+        let g_beginning = format!("{:?}", g);
+
+        assert_eq!(
+            g_beginning.get(0..16).unwrap(),
+            String::from("Game { points: 0")
+        );
+    }
+}
