@@ -26,14 +26,15 @@ with_jacoby();
 ```
 
 ## Discussions and Support
-Any support is very welcome. Please use the following matrix room to discuss topics around this
-crate: [#backgammon:carlostrub.ch](https://matrix.to/#/#backgammon:carlostrub.ch)
+Any support is very welcome. Please use [Bitbucket
+Issues](https://bitbucket.org/carlostrub/backgammon/issues?status=new&status=open) to discuss
+features or ask for help.
 
 ## Source Code Integrity
 All commits are signed with the following GPG key (find the respective key for example in the
-[FreeBSD keyring](https://www.freebsd.org/doc/pgpkeyring.txt)):
+    [FreeBSD keyring](https://docs.freebsd.org/pgpkeys/pgpkeys.txt)):
 
-`3626 000C 0372 A78C 5DD7  B096 34EF 3FF3 3C29 811A`
+`59A6 2B5D B2FE B9CA 2358  4FA1 1C7A 2F39 D966 052B`
 
 You can verify the integrity of the code by running:
 
