@@ -250,10 +250,11 @@ mod tests {
     #[test]
     fn debug_game() {
         let g = Game::default();
+        let g_beginning = format!("{:?}", g);
 
         assert_eq!(
-            format!("The game is: {:?}", g),
-            "The game is: Game { points: 0, dices: (0, 0), who_plays: Nobody, board: [2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0], cube: 0, cube_owner: Nobody, cube_received: false, crawford: false, since_crawford: 0 }"
+            g_beginning.get(0..16).unwrap(),
+            String::from("Game { points: 0")
         );
     }
 }
