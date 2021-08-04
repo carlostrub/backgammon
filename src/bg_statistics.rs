@@ -36,7 +36,7 @@ mod tests {
     #[test]
     fn rule_stop() {
         let ten_millis = time::Duration::from_millis(10);
-        let s = Statistics::default();
+        let mut s = Statistics::default();
         thread::sleep(ten_millis);
         s.stop();
 

@@ -111,11 +111,12 @@ mod tests {
 
     #[test]
     fn roll_test() {
-        let d = roll();
-        assert!(d.0 > 0);
-        assert!(d.0 < 7);
-        assert!(d.1 > 0);
-        assert!(d.1 < 7);
+        let g = Game::default();
+        let d = g.roll(Player::Player1).unwrap();
+        assert!(d.dices.0 > 0);
+        assert!(d.dices.0 < 7);
+        assert!(d.dices.1 > 0);
+        assert!(d.dices.1 < 7);
     }
 
     #[test]
@@ -123,8 +124,9 @@ mod tests {
         let mut sum: u32 = 0;
 
         for _x in 0..1_000_000 {
-            let d = roll();
-            sum += (d.0 + d.1) as u32;
+            let g = Game::default();
+            let d = g.roll(Player::Player1).unwrap();
+            sum += (d.dices.0 + d.dices.1) as u32;
         }
 
         let average = (sum as f64) / 2_000_000.;
