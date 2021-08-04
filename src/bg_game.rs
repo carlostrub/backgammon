@@ -17,9 +17,9 @@ impl Game {
         let between = Uniform::new_inclusive(1, 6);
         let mut rng = rand::thread_rng();
 
-        match self.who_plays != p {
-            true => Err(Error::TurnError),
-            false => match self.cube_received {
+        match self.who_plays == p || self.who_plays == Player::Nobody {
+            false => Err(Error::TurnError),
+            true => match self.cube_received {
                 true => Err(Error::DiceReceivedError),
                 false => {
                     self.dices = (between.sample(&mut rng), between.sample(&mut rng));
@@ -34,15 +34,17 @@ impl Game {
         loop {
             let g = self.roll(Player::Nobody);
             match g {
-                Ok(mut game) => {
-                    if &game.dices.0 != &game.dices.1 {
-                        if &game.dices.0 > &game.dices.1 {
-                            game.who_plays = Player::Player1;
+                Ok(mut g) => {
+                    if &g.dices.0 != &g.dices.1 {
+                        if &g.dices.0 > &g.dices.1 {
+                            g.who_plays = Player::Player1;
                         } else {
-                            game.who_plays = Player::Player2;
+                            g.who_plays = Player::Player2;
                         }
+                        return Ok(g);
+                    } else {
+                        continue;
                     }
-                    return Ok(game);
                 }
                 Err(_) => return Err(Error::StartedError),
             }

@@ -93,7 +93,7 @@ struct CurrentRules {
 }
 
 /// Holds various statistical information about a Match or a Game
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Statistics {
     /// start time
     time_start: SystemTime,
@@ -166,7 +166,7 @@ impl fmt::Display for Error {
 }
 
 /// This enum is used in several places, e.g. for cube ownership or for winner
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Player {
     /// none of the two players, e.g. at start
     Nobody,
@@ -177,7 +177,7 @@ pub enum Player {
 }
 
 /// Represents a Backgammon game
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Game {
     /// how many points in the game?
     pub points: u32,
