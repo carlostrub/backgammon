@@ -135,4 +135,13 @@ mod tests {
         assert!(average < 3.51);
         assert!(average > 3.49);
     }
+
+    #[test]
+    fn start_test() {
+        let g = Game::default();
+        for _x in 0..1_000_000 {
+            let d = g.start().unwrap();
+            assert!(d.dices.0 != d.dices.1);
+        }
+    }
 }
