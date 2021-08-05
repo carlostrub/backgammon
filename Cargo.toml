@@ -8,8 +8,9 @@ documentation = "https://docs.rs/backgammon"
 readme = "README.md"
 repository = "https://bitbucket.org/carlostrub/backgammon/src/master"
 license = "BSD-2-Clause"
-keywords = ["backgammon"]
-categories = ["games"]
+license-file = "COPYRIGHT"
+keywords = ["backgammon","gamedev"]
+categories = ["game-development"]
 
 [badges]
 bitbucket-pipelines = { repository = "carlostrub/backgammon", branch = "master" }
