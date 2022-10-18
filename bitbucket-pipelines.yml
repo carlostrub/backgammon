@@ -27,9 +27,25 @@ definitions:
               - cargo-target
               script:
               - cargo build -v
+      - step: &sonarcloud
+              name: SonarCloud
+              caches:
+              - sonar
+              - cargo
+              - cargo-target
+              script:
+              - pipe: sonarsource/sonarcloud-scan:1.4.0
+                variables:
+                SONAR_TOKEN: ${SONAR_TOKEN}
+                EXTRA_ARGS: '-Dsonar.projectKey=backgammon -Dsonar.sources=src -Dsonar.tests=src'
+      - step: &check-quality-gate-sonarcloud
+              name: Quality Gate
+              caches:
+              - sonar
+              script:
+              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
       - step: &test
               name: Test
-              image: rustlang/rust:nightly
               caches:
               - cargo
               - cargo-target
@@ -42,23 +58,6 @@ definitions:
                 zip -0 ccov.zip `find . \( -name "backgammon*.gc*" \) -print`;
                 ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
                 bash <(curl -s https://codecov.io/bash) -f lcov.info;
-      - step: &sonarcloud
-              name: SonarCloud
-              caches:
-              - sonar
-              - cargo
-              - cargo-target
-              script:
-              - pipe: sonarsource/sonarcloud-scan:1.2.1
-                variables:
-                SONAR_TOKEN: ${SONAR_TOKEN}
-                EXTRA_ARGS: '-Dsonar.projectKey=backgammon -Dsonar.sources=src -Dsonar.tests=src'
-      - step: &check-quality-gate-sonarcloud
-              name: Quality Gate
-              caches:
-              - sonar
-              script:
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
       - step: &deployment
               name: Deploy to Crates
               deployment: Crates
@@ -73,15 +72,18 @@ definitions:
 pipelines:
   default:
       - step: *clippy
+      - step: *sonarcloud
       - step: *test
   branches:
     master:
       - step: *clippy
+      - step: *sonarcloud
       - step: *build
       - step: *test
       - step: *deployment
   pull-requests:
     '**':
       - step: *clippy
+      - step: *sonarcloud
       - step: *build
       - step: *test
