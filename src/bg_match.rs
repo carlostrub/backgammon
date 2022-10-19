@@ -1,16 +1,22 @@
-use super::{CurrentRules, Match, Rules, Statistics};
-
-use std::time::{Duration, SystemTimeError};
+use crate::bg_game::Game;
+use crate::bg_rules::Rules;
 use uuid::Uuid;
+
+/// Represents a Backgammon match
+#[derive(Debug)]
+pub struct Match {
+    id: Uuid,
+    rules: Box<Rules>,
+    games: Vec<Game>,
+}
 
 impl Default for Match {
     fn default() -> Self {
         Match {
             id: Uuid::new_v4(),
             points: 3,
-            rules: CurrentRules::default(),
+            rules: Rules::default(),
             games: Vec::new(),
-            statistics: Statistics::default(),
         }
     }
 }
@@ -39,29 +45,6 @@ impl Match {
     /// How many points are required to win the match
     pub fn get_points(&self) -> u32 {
         self.points
-    }
-
-    /// Start the match
-    /// 1. dices are rolled for the first time
-    /// 2. A first game is stored
-    /// 3. Whoever may start, may do so
-    pub fn start(mut self) -> Self {
-        self.statistics = Statistics::default();
-
-        self
-    }
-
-    /// Stop the match
-    /// 1. Winner is assigned based on current points
-    pub fn stop(mut self) -> Self {
-        // TODO: the winner needs to be declared, etc.
-        self.statistics.stop();
-        self
-    }
-
-    /// Duration of this match
-    pub fn duration(&self) -> Result<Duration, SystemTimeError> {
-        self.statistics.duration()
     }
 }
 

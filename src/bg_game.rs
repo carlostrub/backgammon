@@ -1,6 +1,29 @@
 use rand::distributions::{Distribution, Uniform};
-
-use super::{Error, Game, Player, Statistics};
+/// Represents a Backgammon game
+#[derive(Debug, Clone, Copy)]
+pub struct Game {
+    /// how many points in the game?
+    pub points: u32,
+    /// who is the winner?
+    pub winner: Player,
+    /// last dice pair rolled
+    pub dices: (u8, u8),
+    /// whose turn is it?
+    pub who_plays: Player,
+    /// a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
+    /// the off for Player 1 and 2
+    pub board: ([i8; 24], (u8, u8), (u8, u8)),
+    /// cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
+    pub cube: u8,
+    /// who holds the cube
+    pub cube_owner: Player,
+    /// was cube offered to the one who plays?
+    pub cube_received: bool,
+    // Crawford rule: if crawford game, no doubling allowed
+    crawford: bool,
+    // Holland rule: if <4 rolls of crawford game, no doubling allowed
+    since_crawford: u8,
+}
 
 // Backgammon uses 15 checkers per side
 //const CHECKERS: u8 = 15;
@@ -102,7 +125,6 @@ impl Default for Game {
             cube_received: false,
             crawford: false,
             since_crawford: 0,
-            statistics: Statistics::default(),
         }
     }
 }

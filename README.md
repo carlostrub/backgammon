@@ -15,15 +15,23 @@ This library supports the following rules on the doubling cube:
 * Holland
 
 ## Examples
-Start a new match with no extra rules:
+Start a new backgammon match over default (3) points and with no extra rules:
 ```
-use backgammon::{Match,Rules};
+use backgammon::Match;
+
+let mut m = Match::new()
+
+```
+Typically, you want to define the points for a match, hence:
+```
+use backgammon::Match;
 
 let mut m = Match::new().
 with_points(3);
 
 ```
-Start a new match with specific rules:
+Depending on the style of tournament you decide to play, it makes sense to select one or more
+rules too:
 ```
 use backgammon::{Match,Rules};
 

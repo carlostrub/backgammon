@@ -1,9 +1,73 @@
-use super::CurrentRules;
-use super::Rules;
+///
+/// Holds the rules of the match
+#[derive(Debug)]
+struct Rules {
+    /// The amount of points to reach for declaring a winner
+    points: u32,
+    /// When offered the cube, allow to re-double but keep it.
+    beaver: bool,
+    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
+    raccoon: bool,
+    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
+    /// of the board
+    murphy: bool,
+    /// How often to apply automatic doubling rule. 0 means always on.
+    murphy_limit: u8,
+    /// Gammon and Backgammon only count for double or triple values if the cube has already been
+    /// offered.
+    jacoby: bool,
+    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
+    /// game.
+    crawford: bool,
+    /// Permits to double after Crawford game only if both players have rolled at least twice
+    holland: bool,
+}
 
-impl Default for CurrentRules {
-    fn default() -> Self {
-        CurrentRules {
+/// Implements the Backgammon rules
+pub trait Match {
+    /// When offered the cube, allow to re-double but keep it.
+    fn set_beaver(&self) -> Box<dyn Rules>;
+    fn unset_beaver(&self) -> Box<dyn Rules>;
+    /// Return true if beaver rule is set
+    fn is_beaver(&self) -> bool;
+    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
+    fn set_raccoon(&self) -> Box<dyn Rules>;
+    fn unset_raccoon(&self) -> Box<dyn Rules>;
+    /// Return true if Raccoon rule is set
+    fn is_raccoon(&self) -> bool;
+    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
+    /// of the board
+    fn set_murphy(&self, limit: u8) -> Box<dyn Rules>;
+    fn unset_murphy(&self, limit: u8) -> Box<dyn Rules>;
+    /// Return true if Murphy rule is set
+    fn is_murphy(&self) -> bool;
+    /// Gammon and Backgammon only count for double or triple values if the cube has already been
+    /// offered.
+    fn set_jacoby(&self) -> Box<dyn Rules>;
+    fn unset_jacoby(&self) -> Box<dyn Rules>;
+    /// Return true if Jacoby rule is set
+    fn is_jacoby(&self) -> bool;
+    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
+    /// game.
+    fn set_crawford(&self) -> Box<dyn Rules>;
+    fn unset_crawford(&self) -> Box<dyn Rules>;
+    /// Return true if Crawford rule is set
+    fn is_crawford(&self) -> bool;
+    /// Permits to double after Crawford game only if both players have rolled at least twice
+    fn set_holland(&self) -> Box<dyn Rules>;
+    fn unset_holland(&self) -> Box<dyn Rules>;
+    /// Return true if Holland rule is set
+    fn is_holland(&self) -> bool;
+}
+
+
+/// This enum is used in several places, e.g. for cube ownership or for winner
+#[derive(Debug, PartialEq, Clone, Copy)]
+
+
+impl Default for Box<dyn Rules> {
+    fn default() -> Box<dyn Rules> {
+        Box<dyn Rules> {
             beaver: false,
             raccoon: false,
             murphy: false,
@@ -15,9 +79,9 @@ impl Default for CurrentRules {
     }
 }
 
-impl Rules for CurrentRules {
-    fn with_beaver(self) -> Self {
-        CurrentRules {
+impl Rules for box<Rules> {
+    fn with_beaver(self) -> Box<dyn Rules> {
+        BGRules {
             beaver: true,
             ..self
         }
@@ -26,8 +90,8 @@ impl Rules for CurrentRules {
         self.beaver
     }
 
-    fn with_raccoon(self) -> Self {
-        CurrentRules {
+    fn with_raccoon(self) -> Box<dyn Rules> {
+        Box<dyn BGRules> {
             beaver: true,
             raccoon: true,
             ..self
@@ -37,8 +101,8 @@ impl Rules for CurrentRules {
         self.raccoon
     }
 
-    fn with_murphy(self, limit: u8) -> Self {
-        CurrentRules {
+    fn with_murphy(self, limit: u8) -> Box<dyn Rules> {
+        Box<dyn BGRules>{
             murphy: true,
             murphy_limit: limit,
             ..self
@@ -48,8 +112,8 @@ impl Rules for CurrentRules {
         self.murphy
     }
 
-    fn with_jacoby(self) -> Self {
-        CurrentRules {
+    fn with_jacoby(self) -> Box<dyn Rules> {
+        Box<dyn BGRules> {
             jacoby: true,
             ..self
         }
@@ -58,8 +122,8 @@ impl Rules for CurrentRules {
         self.jacoby
     }
 
-    fn with_crawford(self) -> Self {
-        CurrentRules {
+    fn with_crawford(self) -> Box<dyn Rules> {
+        Box<dyn BGRules> {
             crawford: true,
             ..self
         }
@@ -68,8 +132,8 @@ impl Rules for CurrentRules {
         self.crawford
     }
 
-    fn with_holland(self) -> Self {
-        CurrentRules {
+    fn with_holland(self) -> Box<dyn Rules> {
+        Box<dyn BGRules> {
             crawford: true,
             holland: true,
             ..self
