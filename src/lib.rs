@@ -13,8 +13,16 @@
 //! * Crawford
 //! * Holland
 //!
-//! ## Example
-//! Start a new match with rules:
+//! ## Examples
+//! Start a new match with no extra rules:
+//! ```
+//! use backgammon::{Match,Rules};
+//!
+//! let mut m = Match::new().
+//! with_points(3);
+//!
+//! ```
+//! Start a new match with specific rules:
 //! ```
 //! use backgammon::{Match,Rules};
 //!
@@ -25,19 +33,9 @@
 //! ```
 //!
 //! ## Discussions and Support
-//! Any support is very welcome. Please use [Bitbucket
+//! Remember that the APIs are not stable yet. Any support is very welcome. Please use [Bitbucket
 //! Issues](https://bitbucket.org/carlostrub/backgammon/issues?status=new&status=open) to discuss
 //! features or ask for help.
-//!
-//! ## Source Code Integrity
-//! All commits are signed with the following GPG key (find the respective key for example in the
-//!     [FreeBSD keyring](https://docs.freebsd.org/pgpkeys/pgpkeys.txt)):
-//!
-//! `59A6 2B5D B2FE B9CA 2358  4FA1 1C7A 2F39 D966 052B`
-//!
-//! You can verify the integrity of the code by running:
-//!
-//! `git log --show-signature`
 
 #![warn(future_incompatible)]
 #![deny(
