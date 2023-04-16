@@ -1,4 +1,58 @@
-///
+/// Part of the rules of the game is that only two players can play each other. Sometimes, nobody
+/// is allowed to move, thus we define this as the default
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum Player {
+    /// none of the two players, e.g. at start
+    Nobody,
+    /// Player 1
+    Player1,
+    /// Player 2
+    Player2,
+}
+
+/// Holds the rules of the match
+#[derive(Debug)]
+pub struct Rules {
+    /// The amount of points to reach for declaring a winner
+    points: u32,
+    /// When offered the cube, allow to re-double but keep it.
+    beaver: bool,
+    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
+    raccoon: bool,
+    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
+    /// of the board
+    murphy: bool,
+    /// How often to apply automatic doubling rule. 0 means always on.
+    murphy_limit: u8,
+    /// Gammon and Backgammon only count for double or triple values if the cube has already been
+    /// offered.
+    jacoby: bool,
+    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
+    /// game.
+    crawford: bool,
+    /// Permits to double after Crawford game only if both players have rolled at least twice
+    holland: bool,
+}
+
+/// Implements the Backgammon rules
+pub trait Match {
+    /// When offered the cube, allow to re-double but keep it.
+    fn set_beaver(&self) -> Box<dyn Rules>;
+    fn unset_beaver(&self) -> Box<dyn Rules>;
+    /// Return true if beaver rule is set
+    fn is_beaver(&self) -> bool;
+    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
+    fn set_raccoon(&self) -> Box<dyn Rules>;
+    fn unset_raccoon(&self) -> Box<dyn Rules>;
+    /// Return true if Raccoon rule is set
+    fn is_raccoon(&self) -> bool;
+    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
+    /// of the board
+    fn set_murphy(&self, limit: u8) -> Box<dyn Rules>;
+    fn unset_murphy(&self, limit: u8) -> Box<dyn Rules>;
+}
+
+
 /// Holds the rules of the match
 #[derive(Debug)]
 struct Rules {

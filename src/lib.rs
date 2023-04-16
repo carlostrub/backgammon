@@ -69,8 +69,6 @@ mod bg_game;
 /// Implements a Backgammon match
 mod bg_match;
 /// Implements all Backgammon rules
-mod bg_players;
-/// Implements all Backgammon rules
 mod bg_rules;
 
 //#[cfg(test)]

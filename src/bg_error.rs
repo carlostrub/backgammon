@@ -15,8 +15,11 @@ pub enum Error {
     /// Doubling not permitted
     DoubleError,
 }
+
+// implement Error trait
 impl std::error::Error for Error {}
 
+// implement Display trait
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
