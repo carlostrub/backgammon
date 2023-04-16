@@ -1,18 +1,21 @@
-# This is a sample build configuration for Rust.
-# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
 image: rust:latest
+
 clone:
       depth: full
 
 definitions:
       caches:
-            sonar: ~/.sonar/cache  # Caching SonarCloud artifacts will speed up your build
+            sonar: /root/.sonar/cache  # Caching SonarCloud artifacts will speed up your build
             cargo: /usr/local/cargo
-            cargo-target: target
+            cargo-target: $BITBUCKET_CLONE_DIR/target
       steps:
+      - step: &fmt
+              name: Check Correct Formating
+              caches:
+              - cargo
+              script:
+              - rustup component add rustfmt
+              - cargo fmt --all -- --check
       - step: &clippy
               name: Static Code Analysis
               caches:
@@ -31,8 +34,6 @@ definitions:
               name: SonarCloud
               caches:
               - sonar
-              - cargo
-              - cargo-target
               script:
               - pipe: sonarsource/sonarcloud-scan:1.4.0
                 variables:
@@ -58,6 +59,13 @@ definitions:
                 zip -0 ccov.zip `find . \( -name "backgammon*.gc*" \) -print`;
                 ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
                 bash <(curl -s https://codecov.io/bash) -f lcov.info;
+      - step: &audit
+              name: Audit
+              caches:
+              - cargo
+              script:
+              - cargo install cargo-audit
+              - cargo audit
       - step: &deployment
               name: Deploy to Crates
               deployment: Crates
@@ -72,18 +80,21 @@ definitions:
 pipelines:
   default:
       - step: *clippy
-      - step: *sonarcloud
       - step: *test
   branches:
     master:
+      - step: *fmt
       - step: *clippy
       - step: *sonarcloud
+      - step: *audit
       - step: *build
       - step: *test
       - step: *deployment
   pull-requests:
     '**':
+      - step: *fmt
       - step: *clippy
       - step: *sonarcloud
+      - step: *audit
       - step: *build
       - step: *test
