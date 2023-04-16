@@ -1,7 +1,7 @@
 /// Backgammon requires certain game specific errors
 use std::fmt;
 
-/// Represents a Backgammon error
+/// We represent all Backgammon errors as an enum
 #[derive(Debug)]
 pub enum Error {
     /// Game has already started
@@ -25,11 +25,11 @@ impl fmt::Display for Error {
         match self {
             Error::StartedError => write!(f, "Game has already started"),
             Error::EndedError => write!(f, "Game has already ended"),
-            Error::TurnError => write!(f, "Other player's turn"),
+            Error::TurnError => write!(f, "Opponent's turn"),
             Error::DiceReceivedError => {
                 write!(
                     f,
-                    "Opponent offered dice. Need to react on this event first."
+                    "Opponent offered dice. Need to first accept or decline the doubling dice."
                 )
             }
             Error::DoubleError => write!(f, "Doubling not permitted"),
