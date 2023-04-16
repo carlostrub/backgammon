@@ -1,8 +1,12 @@
-/// Part of the rules of the game is that only two players can play each other. Sometimes, nobody
+/// This module contains all the rules for the game of Backgammon
+use std::fmt;
+
+/// Part of the rules of the game is that this game is for only two players. In some cases, nobody
 /// is allowed to move, thus we define this as the default
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Hash, Default)]
 pub enum Player {
     /// none of the two players, e.g. at start
+    #[default]
     Nobody,
     /// Player 1
     Player1,
@@ -10,118 +14,47 @@ pub enum Player {
     Player2,
 }
 
+// Implement Display trait for Player
+impl fmt::Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Player::Nobody => write!(f, "Nobody"),
+            Player::Player1 => write!(f, "Player 1"),
+            Player::Player2 => write!(f, "Player 2"),
+        }
+    }
+}
+
 /// Holds the rules of the match
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Hash)]
 pub struct Rules {
-    /// The amount of points to reach for declaring a winner
+    /// The amount of points to reach for declaring a winner, default is 7.
     points: u32,
-    /// When offered the cube, allow to re-double but keep it.
+    /// When offered the cube, allow to re-double but keep it, default is false.
     beaver: bool,
     /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
+    /// Default is false
     raccoon: bool,
     /// If both players roll the same opening number, the dice is doubled, remaining in the middle
-    /// of the board
+    /// of the board. Default is false.
     murphy: bool,
-    /// How often to apply automatic doubling rule. 0 means always on.
+    /// How often to apply automatic doubling rule. 0 means always on. Default is 0.
     murphy_limit: u8,
     /// Gammon and Backgammon only count for double or triple values if the cube has already been
-    /// offered.
+    /// offered. Default is false.
     jacoby: bool,
     /// When a player first reaches a score of points - 1, no doubling is allowed for the following
-    /// game.
+    /// game. Default is true.
     crawford: bool,
-    /// Permits to double after Crawford game only if both players have rolled at least twice
+    /// Permits to double after Crawford game only if both players have rolled at least twice.
+    /// Default is false.
     holland: bool,
 }
 
-/// Implements the Backgammon rules
-pub trait Match {
-    /// When offered the cube, allow to re-double but keep it.
-    fn set_beaver(&self) -> Box<dyn Rules>;
-    fn unset_beaver(&self) -> Box<dyn Rules>;
-    /// Return true if beaver rule is set
-    fn is_beaver(&self) -> bool;
-    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
-    fn set_raccoon(&self) -> Box<dyn Rules>;
-    fn unset_raccoon(&self) -> Box<dyn Rules>;
-    /// Return true if Raccoon rule is set
-    fn is_raccoon(&self) -> bool;
-    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
-    /// of the board
-    fn set_murphy(&self, limit: u8) -> Box<dyn Rules>;
-    fn unset_murphy(&self, limit: u8) -> Box<dyn Rules>;
-}
-
-
-/// Holds the rules of the match
-#[derive(Debug)]
-struct Rules {
-    /// The amount of points to reach for declaring a winner
-    points: u32,
-    /// When offered the cube, allow to re-double but keep it.
-    beaver: bool,
-    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
-    raccoon: bool,
-    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
-    /// of the board
-    murphy: bool,
-    /// How often to apply automatic doubling rule. 0 means always on.
-    murphy_limit: u8,
-    /// Gammon and Backgammon only count for double or triple values if the cube has already been
-    /// offered.
-    jacoby: bool,
-    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
-    /// game.
-    crawford: bool,
-    /// Permits to double after Crawford game only if both players have rolled at least twice
-    holland: bool,
-}
-
-/// Implements the Backgammon rules
-pub trait Match {
-    /// When offered the cube, allow to re-double but keep it.
-    fn set_beaver(&self) -> Box<dyn Rules>;
-    fn unset_beaver(&self) -> Box<dyn Rules>;
-    /// Return true if beaver rule is set
-    fn is_beaver(&self) -> bool;
-    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
-    fn set_raccoon(&self) -> Box<dyn Rules>;
-    fn unset_raccoon(&self) -> Box<dyn Rules>;
-    /// Return true if Raccoon rule is set
-    fn is_raccoon(&self) -> bool;
-    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
-    /// of the board
-    fn set_murphy(&self, limit: u8) -> Box<dyn Rules>;
-    fn unset_murphy(&self, limit: u8) -> Box<dyn Rules>;
-    /// Return true if Murphy rule is set
-    fn is_murphy(&self) -> bool;
-    /// Gammon and Backgammon only count for double or triple values if the cube has already been
-    /// offered.
-    fn set_jacoby(&self) -> Box<dyn Rules>;
-    fn unset_jacoby(&self) -> Box<dyn Rules>;
-    /// Return true if Jacoby rule is set
-    fn is_jacoby(&self) -> bool;
-    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
-    /// game.
-    fn set_crawford(&self) -> Box<dyn Rules>;
-    fn unset_crawford(&self) -> Box<dyn Rules>;
-    /// Return true if Crawford rule is set
-    fn is_crawford(&self) -> bool;
-    /// Permits to double after Crawford game only if both players have rolled at least twice
-    fn set_holland(&self) -> Box<dyn Rules>;
-    fn unset_holland(&self) -> Box<dyn Rules>;
-    /// Return true if Holland rule is set
-    fn is_holland(&self) -> bool;
-}
-
-
-/// This enum is used in several places, e.g. for cube ownership or for winner
-#[derive(Debug, PartialEq, Clone, Copy)]
-
-
-impl Default for Box<dyn Rules> {
-    fn default() -> Box<dyn Rules> {
-        Box<dyn Rules> {
+impl Default for Rules {
+    fn default() -> Self {
+        Rules {
+            points: 7,
             beaver: false,
             raccoon: false,
             murphy: false,
@@ -133,9 +66,12 @@ impl Default for Box<dyn Rules> {
     }
 }
 
-impl Rules for box<Rules> {
-    fn with_beaver(self) -> Box<dyn Rules> {
-        BGRules {
+trait DefineRules {
+    fn set_points(self, p: u32) -> Self {
+        Rules { points: p, ..self }
+    }
+    fn with_beaver(self) -> Self {
+        Rules {
             beaver: true,
             ..self
         }
@@ -144,8 +80,8 @@ impl Rules for box<Rules> {
         self.beaver
     }
 
-    fn with_raccoon(self) -> Box<dyn Rules> {
-        Box<dyn BGRules> {
+    fn with_raccoon(self) -> Self {
+        Rules {
             beaver: true,
             raccoon: true,
             ..self
@@ -155,8 +91,8 @@ impl Rules for box<Rules> {
         self.raccoon
     }
 
-    fn with_murphy(self, limit: u8) -> Box<dyn Rules> {
-        Box<dyn BGRules>{
+    fn with_murphy(self, limit: u8) -> Self {
+        Rules {
             murphy: true,
             murphy_limit: limit,
             ..self
@@ -165,9 +101,12 @@ impl Rules for box<Rules> {
     fn is_murphy(&self) -> bool {
         self.murphy
     }
+    fn murphy_limit(&self) -> u8 {
+        self.murphy_limit
+    }
 
-    fn with_jacoby(self) -> Box<dyn Rules> {
-        Box<dyn BGRules> {
+    fn with_jacoby(self) -> Self {
+        Rules {
             jacoby: true,
             ..self
         }
@@ -176,8 +115,8 @@ impl Rules for box<Rules> {
         self.jacoby
     }
 
-    fn with_crawford(self) -> Box<dyn Rules> {
-        Box<dyn BGRules> {
+    fn with_crawford(self) -> Self {
+        Rules {
             crawford: true,
             ..self
         }
@@ -186,8 +125,8 @@ impl Rules for box<Rules> {
         self.crawford
     }
 
-    fn with_holland(self) -> Box<dyn Rules> {
-        Box<dyn BGRules> {
+    fn with_holland(self) -> Self {
+        Rules {
             crawford: true,
             holland: true,
             ..self
