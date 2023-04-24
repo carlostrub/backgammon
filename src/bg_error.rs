@@ -1,4 +1,4 @@
-/// Backgammon requires certain game specific errors
+/// This module contains the error definition for the Backgammon game.
 use std::fmt;
 
 /// We represent all Backgammon errors as an enum
