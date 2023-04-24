@@ -1,12 +1,15 @@
 use crate::bg_game::Game;
-use crate::bg_rules::Rules;
+use crate::bg_rules::{Rules, SetRules};
+
+use std::fmt;
 use uuid::Uuid;
 
-/// Represents a Backgammon match
-#[derive(Debug)]
+/// A Backgammon match consists of an Id (to be used in applications calling this library), a set
+/// of rules and a vector of games
+#[derive(Debug, Clone)]
 pub struct Match {
     id: Uuid,
-    rules: Box<Rules>,
+    rules: Rules,
     games: Vec<Game>,
 }
 
@@ -14,10 +17,16 @@ impl Default for Match {
     fn default() -> Self {
         Match {
             id: Uuid::new_v4(),
-            points: 3,
             rules: Rules::default(),
             games: Vec::new(),
         }
+    }
+}
+
+// implement Display trait
+impl fmt::Display for Match {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Match: {}, Games: {:?}", self.id, self.games)
     }
 }
 
@@ -30,144 +39,90 @@ impl Match {
     /// let m = Match::new();
     ///
     /// # use backgammon::Rules;
-    /// # assert!(&m.is_crawford(),true);
+    /// # assert_eq!(m.rules, Rules::default());
     /// ```
     pub fn new() -> Self {
         Match::default()
     }
+}
 
-    /// Define the points required to win the match
-    pub fn with_points(mut self, p: u32) -> Self {
-        self.points = p;
+/// Implements SetRules for Match
+impl SetRules for Match {
+    fn with_points(mut self, points: u32) -> Self {
+        self.rules.points = points;
         self
     }
 
-    /// How many points are required to win the match
-    pub fn get_points(&self) -> u32 {
-        self.points
+    fn with_beaver(mut self) -> Self {
+        self.rules.beaver = true;
+        self
+    }
+
+    fn with_raccoon(mut self) -> Self {
+        self.rules.raccoon = true;
+        self
+    }
+
+    fn with_murphy(mut self, limit: u8) -> Self {
+        self.rules.murphy = true;
+        self.rules.murphy_limit = limit;
+        self
+    }
+
+    fn with_jacoby(mut self) -> Self {
+        self.rules.jacoby = true;
+        self
+    }
+
+    fn with_crawford(mut self) -> Self {
+        self.rules.crawford = true;
+        self
+    }
+
+    fn with_holland(mut self) -> Self {
+        self.rules.holland = true;
+        self
     }
 }
 
-impl Rules for Match {
-    fn with_beaver(self) -> Self {
-        Match {
-            rules: self.rules.with_beaver(),
-            ..self
-        }
-    }
-    fn is_beaver(&self) -> bool {
-        self.rules.is_beaver()
-    }
-
-    fn with_raccoon(self) -> Self {
-        Match {
-            rules: self.rules.with_raccoon(),
-            ..self
-        }
-    }
-    fn is_raccoon(&self) -> bool {
-        self.rules.is_raccoon()
-    }
-
-    fn with_murphy(self, limit: u8) -> Self {
-        Match {
-            rules: self.rules.with_murphy(limit),
-            ..self
-        }
-    }
-    fn is_murphy(&self) -> bool {
-        self.rules.is_murphy()
-    }
-
-    fn with_jacoby(self) -> Self {
-        Match {
-            rules: self.rules.with_jacoby(),
-            ..self
-        }
-    }
-    fn is_jacoby(&self) -> bool {
-        self.rules.is_jacoby()
-    }
-
-    fn with_crawford(self) -> Self {
-        Match {
-            rules: self.rules.with_crawford(),
-            ..self
-        }
-    }
-    fn is_crawford(&self) -> bool {
-        self.rules.is_crawford()
-    }
-
-    fn with_holland(self) -> Self {
-        Match {
-            rules: self.rules.with_holland(),
-            ..self
-        }
-    }
-    fn is_holland(&self) -> bool {
-        self.rules.is_holland()
-    }
-}
-
+// Unit tests
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]
-    fn rule_test_murphy() {
-        let m = Match::new().with_murphy(3);
-
-        assert!(&m.is_murphy());
+    fn test_default_match() {
+        let m = Match::default();
+        assert_eq!(m.rules, Rules::default());
+        assert_eq!(m.games.len(), 0);
+        assert_eq!(m.id.get_version_num(), 4);
     }
 
     #[test]
-    fn rule_test_raccoon() {
-        let m = Match::new().with_raccoon();
-
-        assert!(&m.is_raccoon());
+    fn test_new_match() {
+        let m = Match::new();
+        assert_eq!(m.rules, Rules::default());
+        assert_eq!(m.games.len(), 0);
+        assert_eq!(m.id.get_version_num(), 4);
     }
 
     #[test]
-    fn rule_test_jacoby() {
-        let m = Match::new().with_jacoby();
-
-        assert!(&m.is_jacoby());
-    }
-
-    #[test]
-    fn rule_test_crawford() {
-        let m = Match::new().with_crawford();
-
-        assert!(&m.is_crawford());
-    }
-
-    #[test]
-    fn rule_test_holland() {
-        let m = Match::new().with_holland();
-
-        assert!(&m.is_holland());
-    }
-
-    #[test]
-    fn rule_test_beaver() {
-        let m = Match::new().with_beaver();
-
-        assert!(&m.is_beaver());
-    }
-
-    #[test]
-    fn match_test_points() {
-        let m = Match::new().with_points(13).with_holland();
-
-        assert!(m.get_points() == 13);
-    }
-
-    #[test]
-    fn match_test_points1() {
-        let m = Match::new().with_holland().with_points(13).with_beaver();
-
-        assert!(m.get_points() == 13);
+    fn test_set_rules() {
+        let m = Match::new()
+            .with_points(5)
+            .with_beaver()
+            .with_raccoon()
+            .with_murphy(3)
+            .with_jacoby()
+            .with_crawford()
+            .with_holland();
+        assert_eq!(m.rules.points, 5);
+        assert_eq!(m.rules.beaver, true);
+        assert_eq!(m.rules.raccoon, true);
+        assert_eq!(m.rules.murphy, true);
+        assert_eq!(m.rules.murphy_limit, 3);
+        assert_eq!(m.rules.jacoby, true);
+        assert_eq!(m.rules.crawford, true);
+        assert_eq!(m.rules.holland, true);
     }
 }

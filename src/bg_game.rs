@@ -1,27 +1,32 @@
-use crate::bg_rules::Player;
 use crate::bg_error::Error;
+use crate::bg_rules::{Player, Rules, SetRules};
+
 use rand::distributions::{Distribution, Uniform};
+use std::fmt;
+use uuid::Uuid;
 
 /// Represents a Backgammon game
 #[derive(Debug, Clone, Copy)]
 pub struct Game {
-    /// how many points in the game?
-    pub points: u32,
+    /// id of the game
+    id: Uuid,
+    /// rules of the game
+    rules: Rules,
     /// who is the winner?
-    pub winner: Player,
+    winner: Player,
     /// last dice pair rolled
-    pub dices: (u8, u8),
+    dices: (u8, u8),
     /// whose turn is it?
-    pub who_plays: Player,
+    who_plays: Player,
     /// a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
     /// the off for Player 1 and 2
-    pub board: ([i8; 24], (u8, u8), (u8, u8)),
+    board: ([i8; 24], (u8, u8), (u8, u8)),
     /// cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
-    pub cube: u8,
+    cube: u8,
     /// who holds the cube
-    pub cube_owner: Player,
+    cube_owner: Player,
     /// was cube offered to the one who plays?
-    pub cube_received: bool,
+    cube_received: bool,
     // Crawford rule: if crawford game, no doubling allowed
     crawford: bool,
     // Holland rule: if <4 rolls of crawford game, no doubling allowed
@@ -30,60 +35,47 @@ pub struct Game {
 
 // Backgammon uses 15 checkers per side
 //const CHECKERS: u8 = 15;
-impl Game {
-    /// Start a new game
-    pub fn new() -> Self {
-        Game::default()
-    }
-
-    /// Roll the dices which generates two random numbers between 1 and 6, replicating a perfect
-    /// dice. We use the operating systems random number generator.
-    pub fn roll(mut self, p: Player) -> Result<Self, Error> {
-        let between = Uniform::new_inclusive(1, 6);
-        let mut rng = rand::thread_rng();
-
-        match self.who_plays == p || self.who_plays == Player::Nobody {
-            false => Err(Error::TurnError),
-            true => match self.cube_received {
-                true => Err(Error::DiceReceivedError),
-                false => {
-                    self.dices = (between.sample(&mut rng), between.sample(&mut rng));
-                    Ok(self)
-                }
-            },
+impl Default for Game {
+    fn default() -> Self {
+        Game {
+            id: Uuid::new_v4(),
+            rules: Rules::default(),
+            winner: Player::Nobody,
+            dices: (0, 0),
+            cube: 0,
+            cube_owner: Player::Nobody,
+            who_plays: Player::Nobody,
+            board: (
+                [
+                    2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2,
+                ],
+                (0, 0),
+                (0, 0),
+            ),
+            cube_received: false,
+            crawford: false,
+            since_crawford: 0,
         }
     }
-
-    /// Start game by rolling a pair of different
-use rand::distributions::{Distribution, Uniform};
-/// Represents a Backgammon game
-#[derive(Debug, Clone, Copy)]
-pub struct Game {
-    /// how many points in the game?
-    pub points: u32,
-    /// who is the winner?
-    pub winner: Player,
-    /// last dice pair rolled
-    pub dices: (u8, u8),
-    /// whose turn is it?
-    pub who_plays: Player,
-    /// a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
-    /// the off for Player 1 and 2
-    pub board: ([i8; 24], (u8, u8), (u8, u8)),
-    /// cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
-    pub cube: u8,
-    /// who holds the cube
-    pub cube_owner: Player,
-    /// was cube offered to the one who plays?
-    pub cube_received: bool,
-    // Crawford rule: if crawford game, no doubling allowed
-    crawford: bool,
-    // Holland rule: if <4 rolls of crawford game, no doubling allowed
-    since_crawford: u8,
 }
 
-// Backgammon uses 15 checkers per side
-//const CHECKERS: u8 = 15;
+// implement Display trait
+impl fmt::Display for Game {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut s = String::new();
+        s.push_str(&format!("Game id: {}\n", self.id));
+        s.push_str(&format!("Rules: {}\n", self.rules));
+        s.push_str(&format!("Winner: {}\n", self.winner));
+        s.push_str(&format!("Dices: {:?}\n", self.dices));
+        s.push_str(&format!("Cube: {}\n", self.cube));
+        s.push_str(&format!("Cube owner: {}\n", self.cube_owner));
+        s.push_str(&format!("Who plays: {}\n", self.who_plays));
+        s.push_str(&format!("Board: {:?}\n", self.board));
+        s.push_str(&format!("Crawford: {}\n", self.crawford));
+        s.push_str(&format!("Since Crawford: {}\n", self.since_crawford));
+        write!(f, "{}", s)
+    }
+}
 
 impl Game {
     /// Start a new game
@@ -98,9 +90,9 @@ impl Game {
         let mut rng = rand::thread_rng();
 
         match self.who_plays == p || self.who_plays == Player::Nobody {
-            false => Err(Error::TurnError),
+            false => Err(Error::Turn),
             true => match self.cube_received {
-                true => Err(Error::DiceReceivedError),
+                true => Err(Error::DiceReceived),
                 false => {
                     self.dices = (between.sample(&mut rng), between.sample(&mut rng));
                     Ok(self)
@@ -126,7 +118,7 @@ impl Game {
                         continue;
                     }
                 }
-                Err(_) => return Err(Error::StartedError),
+                Err(_) => return Err(Error::Started),
             }
         }
     }
@@ -163,32 +155,79 @@ impl Game {
     //    }
 }
 
-impl Default for Game {
-    fn default() -> Self {
-        Game {
-            points: 0,
-            winner: Player::Nobody,
-            dices: (0, 0),
-            cube: 0,
-            cube_owner: Player::Nobody,
-            who_plays: Player::Nobody,
-            board: (
-                [
-                    2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2,
-                ],
-                (0, 0),
-                (0, 0),
-            ),
-            cube_received: false,
-            crawford: false,
-            since_crawford: 0,
-        }
+/// Implements SetRules for Game
+impl SetRules for Game {
+    fn with_points(mut self, points: u32) -> Self {
+        self.rules.points = points;
+        self
+    }
+
+    fn with_beaver(mut self) -> Self {
+        self.rules.beaver = true;
+        self
+    }
+
+    fn with_raccoon(mut self) -> Self {
+        self.rules.raccoon = true;
+        self
+    }
+
+    fn with_murphy(mut self, limit: u8) -> Self {
+        self.rules.murphy = true;
+        self.rules.murphy_limit = limit;
+        self
+    }
+
+    fn with_jacoby(mut self) -> Self {
+        self.rules.jacoby = true;
+        self
+    }
+
+    fn with_crawford(mut self) -> Self {
+        self.rules.crawford = true;
+        self
+    }
+
+    fn with_holland(mut self) -> Self {
+        self.rules.holland = true;
+        self
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // new game test_default_rules
+    #[test]
+    fn new_test() {
+        let g = Game::new();
+        assert_eq!(g.id.get_version_num(), 4);
+        assert_eq!(g.rules.points, 7);
+        assert_eq!(g.rules.beaver, false);
+        assert_eq!(g.rules.raccoon, false);
+        assert_eq!(g.rules.murphy, false);
+        assert_eq!(g.rules.murphy_limit, 0);
+        assert_eq!(g.rules.jacoby, false);
+        assert_eq!(g.rules.crawford, true);
+        assert_eq!(g.rules.holland, false);
+        assert_eq!(g.winner, Player::Nobody);
+        assert_eq!(g.dices, (0, 0));
+        assert_eq!(g.cube, 0);
+        assert_eq!(g.cube_owner, Player::Nobody);
+        assert_eq!(g.who_plays, Player::Nobody);
+        assert_eq!(
+            g.board,
+            (
+                [2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2],
+                (0, 0),
+                (0, 0)
+            )
+        );
+        assert_eq!(g.cube_received, false);
+        assert_eq!(g.crawford, false);
+        assert_eq!(g.since_crawford, 0);
+    }
 
     #[test]
     fn roll_test() {
@@ -222,5 +261,27 @@ mod tests {
             let d = g.start().unwrap();
             assert!(d.dices.0 != d.dices.1);
         }
+    }
+
+    // test SetRules for Game
+    #[test]
+    fn set_rules_test() {
+        let g = Game::default()
+            .with_points(5)
+            .with_beaver()
+            .with_raccoon()
+            .with_murphy(3)
+            .with_jacoby()
+            .with_crawford()
+            .with_holland();
+
+        assert_eq!(g.rules.points, 5);
+        assert_eq!(g.rules.beaver, true);
+        assert_eq!(g.rules.raccoon, true);
+        assert_eq!(g.rules.murphy, true);
+        assert_eq!(g.rules.murphy_limit, 3);
+        assert_eq!(g.rules.jacoby, true);
+        assert_eq!(g.rules.crawford, true);
+        assert_eq!(g.rules.holland, true);
     }
 }

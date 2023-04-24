@@ -29,26 +29,26 @@ impl fmt::Display for Player {
 #[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Hash)]
 pub struct Rules {
     /// The amount of points to reach for declaring a winner, default is 7.
-    points: u32,
+    pub points: u32,
     /// When offered the cube, allow to re-double but keep it, default is false.
-    beaver: bool,
+    pub beaver: bool,
     /// If a player plays "beaver", the other may double again, letting the opponent keep the cube.
     /// Default is false
-    raccoon: bool,
+    pub raccoon: bool,
     /// If both players roll the same opening number, the dice is doubled, remaining in the middle
     /// of the board. Default is false.
-    murphy: bool,
+    pub murphy: bool,
     /// How often to apply automatic doubling rule. 0 means always on. Default is 0.
-    murphy_limit: u8,
+    pub murphy_limit: u8,
     /// Gammon and Backgammon only count for double or triple values if the cube has already been
     /// offered. Default is false.
-    jacoby: bool,
+    pub jacoby: bool,
     /// When a player first reaches a score of points - 1, no doubling is allowed for the following
     /// game. Default is true.
-    crawford: bool,
+    pub crawford: bool,
     /// Permits to double after Crawford game only if both players have rolled at least twice.
     /// Default is false.
-    holland: bool,
+    pub holland: bool,
 }
 
 impl Default for Rules {
@@ -66,73 +66,124 @@ impl Default for Rules {
     }
 }
 
-trait DefineRules {
-    fn set_points(self, p: u32) -> Self {
-        Rules { points: p, ..self }
+// implement Display trait
+impl fmt::Display for Rules {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "Points: {}, Beaver: {}, Raccoon: {}, Murphy: {}, Murphy Limit: {}, Jacoby: {}, Crawford: {}, Holland: {}",
+            self.points, self.beaver, self.raccoon, self.murphy, self.murphy_limit, self.jacoby, self.crawford, self.holland
+        )
     }
-    fn with_beaver(self) -> Self {
-        Rules {
-            beaver: true,
-            ..self
-        }
-    }
-    fn is_beaver(&self) -> bool {
-        self.beaver
+}
+
+/// SetRules allows to modify the rules
+pub trait SetRules {
+    /// Set the amount of points to reach for declaring a winner
+    fn with_points(self, points: u32) -> Self;
+    /// When offered the cube, allow to re-double but keep it
+    fn with_beaver(self) -> Self;
+    /// If a player plays "beaver", the other may double again, letting the opponent keep the cube
+    fn with_raccoon(self) -> Self;
+    /// If both players roll the same opening number, the dice is doubled, remaining in the middle
+    /// of the board
+    fn with_murphy(self, limit: u8) -> Self;
+    /// Gammon and Backgammon only count for double or triple values if the cube has already been
+    /// offered
+    fn with_jacoby(self) -> Self;
+    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
+    /// game
+    fn with_crawford(self) -> Self;
+    /// Permits to double after Crawford game only if both players have rolled at least twice
+    fn with_holland(self) -> Self;
+}
+
+/// Implements SetRules for Rules
+impl SetRules for Rules {
+    fn with_points(mut self, points: u32) -> Self {
+        self.points = points;
+        self
     }
 
-    fn with_raccoon(self) -> Self {
-        Rules {
-            beaver: true,
-            raccoon: true,
-            ..self
-        }
-    }
-    fn is_raccoon(&self) -> bool {
-        self.raccoon
+    fn with_beaver(mut self) -> Self {
+        self.beaver = true;
+        self
     }
 
-    fn with_murphy(self, limit: u8) -> Self {
-        Rules {
-            murphy: true,
-            murphy_limit: limit,
-            ..self
-        }
-    }
-    fn is_murphy(&self) -> bool {
-        self.murphy
-    }
-    fn murphy_limit(&self) -> u8 {
-        self.murphy_limit
+    fn with_raccoon(mut self) -> Self {
+        self.raccoon = true;
+        self
     }
 
-    fn with_jacoby(self) -> Self {
-        Rules {
-            jacoby: true,
-            ..self
-        }
-    }
-    fn is_jacoby(&self) -> bool {
-        self.jacoby
+    fn with_murphy(mut self, limit: u8) -> Self {
+        self.murphy = true;
+        self.murphy_limit = limit;
+        self
     }
 
-    fn with_crawford(self) -> Self {
-        Rules {
-            crawford: true,
-            ..self
-        }
-    }
-    fn is_crawford(&self) -> bool {
-        self.crawford
+    fn with_jacoby(mut self) -> Self {
+        self.jacoby = true;
+        self
     }
 
-    fn with_holland(self) -> Self {
-        Rules {
-            crawford: true,
-            holland: true,
-            ..self
-        }
+    fn with_crawford(mut self) -> Self {
+        self.crawford = true;
+        self
     }
-    fn is_holland(&self) -> bool {
-        self.holland
+
+    fn with_holland(mut self) -> Self {
+        self.holland = true;
+        self
+    }
+}
+
+/// Test if default rule is created correctly and if the rules can be modified
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_rules() {
+        let rules = Rules::default();
+        assert_eq!(rules.points, 7);
+        assert_eq!(rules.beaver, false);
+        assert_eq!(rules.raccoon, false);
+        assert_eq!(rules.murphy, false);
+        assert_eq!(rules.murphy_limit, 0);
+        assert_eq!(rules.jacoby, false);
+        assert_eq!(rules.crawford, true);
+        assert_eq!(rules.holland, false);
+    }
+
+    #[test]
+    fn test_set_rules() {
+        let rules = Rules::default()
+            .with_points(5)
+            .with_beaver()
+            .with_raccoon()
+            .with_murphy(3)
+            .with_jacoby()
+            .with_crawford()
+            .with_holland();
+        assert_eq!(rules.points, 5);
+        assert_eq!(rules.beaver, true);
+        assert_eq!(rules.raccoon, true);
+        assert_eq!(rules.murphy, true);
+        assert_eq!(rules.murphy_limit, 3);
+        assert_eq!(rules.jacoby, true);
+        assert_eq!(rules.crawford, true);
+        assert_eq!(rules.holland, true);
+    }
+
+    #[test]
+    fn test_with_holland() {
+        let rules = Rules::default().with_holland();
+        assert_eq!(rules.crawford, true);
+    }
+
+    #[test]
+    fn test_with_raccoon() {
+        let rules = Rules::default().with_raccoon();
+        assert_eq!(rules.raccoon, true);
     }
 }

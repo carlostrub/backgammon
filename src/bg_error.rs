@@ -5,15 +5,15 @@ use std::fmt;
 #[derive(Debug)]
 pub enum Error {
     /// Game has already started
-    StartedError,
+    Started,
     /// Game has already ended
-    EndedError,
+    Ended,
     /// Opponent is playing
-    TurnError,
+    Turn,
     /// Opponent offered dice. Need to react on this event first.
-    DiceReceivedError,
+    DiceReceived,
     /// Doubling not permitted
-    DoubleError,
+    Double,
 }
 
 // implement Error trait
@@ -23,16 +23,16 @@ impl std::error::Error for Error {}
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Error::StartedError => write!(f, "Game has already started"),
-            Error::EndedError => write!(f, "Game has already ended"),
-            Error::TurnError => write!(f, "Opponent's turn"),
-            Error::DiceReceivedError => {
+            Error::Started => write!(f, "Game has already started"),
+            Error::Ended => write!(f, "Game has already ended"),
+            Error::Turn => write!(f, "Opponent's turn"),
+            Error::DiceReceived => {
                 write!(
                     f,
                     "Opponent offered dice. Need to first accept or decline the doubling dice."
                 )
             }
-            Error::DoubleError => write!(f, "Doubling not permitted"),
+            Error::Double => write!(f, "Doubling not permitted"),
         }
     }
 }

@@ -65,11 +65,11 @@
 /// Implements all Backgammon rules
 mod bg_error;
 /// Implements a Backgammon game
-mod bg_game;
+pub mod bg_game;
 /// Implements a Backgammon match
-mod bg_match;
+pub mod bg_match;
 /// Implements all Backgammon rules
-mod bg_rules;
+pub mod bg_rules;
 
 //#[cfg(test)]
 //mod tests {
