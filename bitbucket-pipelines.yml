@@ -17,7 +17,7 @@ definitions:
               - rustup component add rustfmt
               - cargo fmt --all -- --check
       - step: &clippy
-              name: Static Code Analysis
+              name: Static Code Analysis Clippy
               caches:
               - cargo
               script:
@@ -31,13 +31,13 @@ definitions:
               script:
               - cargo build -v
       - step: &sonarcloud
-              name: SonarCloud
+              name: Static Code Analysis SonarCloud
               caches:
               - sonar
               script:
               - pipe: sonarsource/sonarcloud-scan:1.4.0
       - step: &sonarcloud-gate
-              name: SonarCloud Quality Gate
+              name: Static Code Analysis SonarCloud Gate
               caches:
               - sonar
               script:
