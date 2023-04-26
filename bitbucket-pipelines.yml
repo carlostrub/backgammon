@@ -79,7 +79,9 @@ definitions:
 
 pipelines:
   default:
+      - step: *fmt
       - step: *clippy
+      - step: *sonarcloud
       - step: *test
   branches:
     master:
