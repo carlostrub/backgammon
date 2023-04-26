@@ -118,12 +118,12 @@ mod tests {
             .with_crawford()
             .with_holland();
         assert_eq!(m.rules.points, 5);
-        assert_eq!(m.rules.beaver, true);
-        assert_eq!(m.rules.raccoon, true);
-        assert_eq!(m.rules.murphy, true);
+        assert!(m.rules.beaver);
+        assert!(m.rules.raccoon);
+        assert!(m.rules.murphy);
         assert_eq!(m.rules.murphy_limit, 3);
-        assert_eq!(m.rules.jacoby, true);
-        assert_eq!(m.rules.crawford, true);
-        assert_eq!(m.rules.holland, true);
+        assert!(m.rules.jacoby);
+        assert!(m.rules.crawford);
+        assert!(m.rules.holland);
     }
 }
