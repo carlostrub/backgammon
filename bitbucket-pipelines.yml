@@ -9,20 +9,17 @@ definitions:
             cargo: /usr/local/cargo
             cargo-target: $BITBUCKET_CLONE_DIR/target
       steps:
-      - step: &fmt
-              name: Check Source Code Formating
+      - step: &static-code-analysis
+              name: Static Code Analysis
               caches:
               - cargo
+              - sonar
               script:
               - rustup component add rustfmt
               - cargo fmt --all -- --check
-      - step: &clippy
-              name: Static Code Analysis Clippy
-              caches:
-              - cargo
-              script:
               - rustup component add clippy
               - cargo clippy --all-targets --all-features -- -D warnings
+              - pipe: sonarsource/sonarcloud-scan:1.4.0
       - step: &build
               name: Build
               caches:
@@ -30,19 +27,6 @@ definitions:
               - cargo-target
               script:
               - cargo build -v
-      - step: &sonarcloud
-              name: Static Code Analysis SonarCloud
-              caches:
-              - sonar
-              script:
-              - pipe: sonarsource/sonarcloud-scan:1.4.0
-      - step: &sonarcloud-gate
-              name: Static Code Analysis SonarCloud Gate
-              caches:
-              - sonar
-              script:
-              - pipe: sonarsource/sonarcloud-scan:1.4.0
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
       - step: &test
               name: Test
               caches:
@@ -73,24 +57,18 @@ definitions:
 
 pipelines:
   default:
-      - step: *fmt
-      - step: *clippy
-      - step: *sonarcloud
+      - step: *static-code-analysis
       - step: *test
   branches:
     master:
-      - step: *fmt
-      - step: *clippy
-      - step: *sonarcloud-gate
+      - step: *static-code-analysis
       - step: *audit
       - step: *build
       - step: *test
       - step: *deployment
   pull-requests:
     '**':
-      - step: *fmt
-      - step: *clippy
-      - step: *sonarcloud
+      - step: *static-code-analysis
       - step: *audit
       - step: *build
       - step: *test
