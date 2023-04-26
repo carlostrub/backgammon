@@ -31,7 +31,7 @@ definitions:
               - cargo-target
               script:
               - cargo test -v --no-fail-fast
-              - cargo install cargo-tarpaulin
+              - command cargo tarpaulin -V &> /dev/null || cargo install cargo-tarpaulin
               - cargo tarpaulin --ciserver bitbucket --coveralls $CODECOV_TOKEN
               - curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov
       - step: &audit
