@@ -10,7 +10,7 @@ definitions:
             cargo-target: $BITBUCKET_CLONE_DIR/target
       steps:
       - step: &fmt
-              name: Check Correct Formating
+              name: Check Source Code Formating
               caches:
               - cargo
               script:
@@ -36,14 +36,12 @@ definitions:
               - sonar
               script:
               - pipe: sonarsource/sonarcloud-scan:1.4.0
-                variables:
-                SONAR_TOKEN: ${SONAR_TOKEN}
-                EXTRA_ARGS: '-Dsonar.projectKey=backgammon -Dsonar.sources=src -Dsonar.tests=src'
-      - step: &check-quality-gate-sonarcloud
-              name: Quality Gate
+      - step: &sonarcloud-gate
+              name: SonarCloud Quality Gate
               caches:
               - sonar
               script:
+              - pipe: sonarsource/sonarcloud-scan:1.4.0
               - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
       - step: &test
               name: Test
@@ -87,7 +85,7 @@ pipelines:
     master:
       - step: *fmt
       - step: *clippy
-      - step: *sonarcloud
+      - step: *sonarcloud-gate
       - step: *audit
       - step: *build
       - step: *test
