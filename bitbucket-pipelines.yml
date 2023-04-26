@@ -1,23 +1,20 @@
-# This is a sample build configuration for Rust.
-# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
 image: rust:latest
+
 clone:
       depth: full
 
 definitions:
       caches:
-            sonar: ~/.sonar/cache  # Caching SonarCloud artifacts will speed up your build
             cargo: /usr/local/cargo
-            cargo-target: target
+            cargo-target: $BITBUCKET_CLONE_DIR/target
       steps:
-      - step: &clippy
+      - step: &static-code-analysis
               name: Static Code Analysis
               caches:
               - cargo
               script:
+              - rustup component add rustfmt
+              - cargo fmt --all -- --check
               - rustup component add clippy
               - cargo clippy --all-targets --all-features -- -D warnings
       - step: &build
@@ -29,36 +26,21 @@ definitions:
               - cargo build -v
       - step: &test
               name: Test
-              image: rustlang/rust:nightly
               caches:
               - cargo
               - cargo-target
               script:
-              - curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-linux-x86_64.tar.bz2 | tar jxf -
-              - export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off"
-              - cargo test -v
-              - apt-get update && apt-get install --yes zip
-              - |
-                zip -0 ccov.zip `find . \( -name "backgammon*.gc*" \) -print`;
-                ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
-                bash <(curl -s https://codecov.io/bash) -f lcov.info;
-      - step: &sonarcloud
-              name: SonarCloud
+              - cargo test -v --no-fail-fast
+              - command cargo tarpaulin -V &> /dev/null || cargo install cargo-tarpaulin
+              - cargo tarpaulin --ciserver bitbucket --coveralls $CODECOV_TOKEN
+              - curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov
+      - step: &audit
+              name: Audit
               caches:
-              - sonar
               - cargo
-              - cargo-target
               script:
-              - pipe: sonarsource/sonarcloud-scan:1.2.1
-                variables:
-                SONAR_TOKEN: ${SONAR_TOKEN}
-                EXTRA_ARGS: '-Dsonar.projectKey=backgammon -Dsonar.sources=src -Dsonar.tests=src'
-      - step: &check-quality-gate-sonarcloud
-              name: Quality Gate
-              caches:
-              - sonar
-              script:
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
+              - cargo install cargo-audit
+              - cargo audit
       - step: &deployment
               name: Deploy to Crates
               deployment: Crates
@@ -72,16 +54,18 @@ definitions:
 
 pipelines:
   default:
-      - step: *clippy
+      - step: *static-code-analysis
       - step: *test
   branches:
     master:
-      - step: *clippy
+      - step: *static-code-analysis
+      - step: *audit
       - step: *build
       - step: *test
       - step: *deployment
   pull-requests:
     '**':
-      - step: *clippy
+      - step: *static-code-analysis
+      - step: *audit
       - step: *build
       - step: *test
