@@ -16,27 +16,29 @@
 //! ## Examples
 //! Start a new backgammon match over default (3) points and with no extra rules:
 //! ```
-//! use backgammon::Match;
+//! use backgammon::r#match::Match;
 //!
-//! let mut m = Match::new()
+//! let mut m = Match::new();
 //!
 //! ```
 //! Typically, you want to define the points for a match, hence:
 //! ```
-//! use backgammon::Match;
+//! use backgammon::r#match::Match;
+//! use backgammon::rules::SetRules;
 //!
 //! let mut m = Match::new().
-//! set_points(3);
+//! with_points(3);
 //!
 //! ```
 //! Depending on the style of tournament you decide to play, it makes sense to select one or more
 //! rules too:
 //! ```
-//! use backgammon::Match;
+//! use backgammon::r#match::Match;
+//! use backgammon::rules::SetRules;
 //!
 //! let mut m = Match::new().
-//! set_points(13).
-//! set_jacoby();
+//! with_points(13).
+//! with_jacoby();
 //!
 //! ```
 //!
@@ -63,13 +65,13 @@
 )] // be tough on code quality
 
 /// Implements all Backgammon rules
-mod bg_error;
+mod error;
 /// Implements a Backgammon game
-pub mod bg_game;
+pub mod game;
 /// Implements a Backgammon match
-pub mod bg_match;
+pub mod r#match;
 /// Implements all Backgammon rules
-pub mod bg_rules;
+pub mod rules;
 
 //#[cfg(test)]
 //mod tests {

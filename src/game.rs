@@ -1,5 +1,6 @@
-use crate::bg_error::Error;
-use crate::bg_rules::{Player, Rules, SetRules};
+use crate::error::Error;
+use crate::rules::player::Player;
+use crate::rules::{Rules, SetRules};
 
 use rand::distributions::{Distribution, Uniform};
 use std::fmt;

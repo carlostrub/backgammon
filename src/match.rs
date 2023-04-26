@@ -1,5 +1,5 @@
-use crate::bg_game::Game;
-use crate::bg_rules::{Rules, SetRules};
+use crate::game::Game;
+use crate::rules::{Rules, SetRules};
 
 use std::fmt;
 use uuid::Uuid;
@@ -9,7 +9,8 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub struct Match {
     id: Uuid,
-    rules: Rules,
+    /// The rules set for the match
+    pub rules: Rules,
     games: Vec<Game>,
 }
 
@@ -34,11 +35,11 @@ impl fmt::Display for Match {
 impl Match {
     /// Start a new match:
     /// ```
-    /// use backgammon::Match;
+    /// use backgammon::r#match::Match;
     ///
     /// let m = Match::new();
     ///
-    /// # use backgammon::Rules;
+    /// # use backgammon::rules::Rules;
     /// # assert_eq!(m.rules, Rules::default());
     /// ```
     pub fn new() -> Self {
