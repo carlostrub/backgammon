@@ -205,13 +205,13 @@ mod tests {
         let g = Game::new();
         assert_eq!(g.id.get_version_num(), 4);
         assert_eq!(g.rules.points, 7);
-        assert_eq!(g.rules.beaver, false);
-        assert_eq!(g.rules.raccoon, false);
-        assert_eq!(g.rules.murphy, false);
+        assert!(!g.rules.beaver);
+        assert!(!g.rules.raccoon);
+        assert!(!g.rules.murphy);
         assert_eq!(g.rules.murphy_limit, 0);
-        assert_eq!(g.rules.jacoby, false);
-        assert_eq!(g.rules.crawford, true);
-        assert_eq!(g.rules.holland, false);
+        assert!(!g.rules.jacoby);
+        assert!(g.rules.crawford);
+        assert!(!g.rules.holland);
         assert_eq!(g.winner, Player::Nobody);
         assert_eq!(g.dices, (0, 0));
         assert_eq!(g.cube, 0);
@@ -225,8 +225,8 @@ mod tests {
                 (0, 0)
             )
         );
-        assert_eq!(g.cube_received, false);
-        assert_eq!(g.crawford, false);
+        assert!(!g.cube_received);
+        assert!(!g.crawford);
         assert_eq!(g.since_crawford, 0);
     }
 
@@ -277,12 +277,12 @@ mod tests {
             .with_holland();
 
         assert_eq!(g.rules.points, 5);
-        assert_eq!(g.rules.beaver, true);
-        assert_eq!(g.rules.raccoon, true);
-        assert_eq!(g.rules.murphy, true);
+        assert!(g.rules.beaver);
+        assert!(g.rules.raccoon);
+        assert!(g.rules.murphy);
         assert_eq!(g.rules.murphy_limit, 3);
-        assert_eq!(g.rules.jacoby, true);
-        assert_eq!(g.rules.crawford, true);
-        assert_eq!(g.rules.holland, true);
+        assert!(g.rules.jacoby);
+        assert!(g.rules.crawford);
+        assert!(g.rules.holland);
     }
 }

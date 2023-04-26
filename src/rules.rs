@@ -124,13 +124,13 @@ mod tests {
     fn test_default_rules() {
         let rules = Rules::default();
         assert_eq!(rules.points, 7);
-        assert_eq!(rules.beaver, false);
-        assert_eq!(rules.raccoon, false);
-        assert_eq!(rules.murphy, false);
+        assert!(!rules.beaver);
+        assert!(!rules.raccoon);
+        assert!(!rules.murphy);
         assert_eq!(rules.murphy_limit, 0);
-        assert_eq!(rules.jacoby, false);
-        assert_eq!(rules.crawford, true);
-        assert_eq!(rules.holland, false);
+        assert!(!rules.jacoby);
+        assert!(rules.crawford);
+        assert!(!rules.holland);
     }
 
     #[test]
@@ -144,24 +144,24 @@ mod tests {
             .with_crawford()
             .with_holland();
         assert_eq!(rules.points, 5);
-        assert_eq!(rules.beaver, true);
-        assert_eq!(rules.raccoon, true);
-        assert_eq!(rules.murphy, true);
+        assert!(rules.beaver);
+        assert!(rules.raccoon);
+        assert!(rules.murphy);
         assert_eq!(rules.murphy_limit, 3);
-        assert_eq!(rules.jacoby, true);
-        assert_eq!(rules.crawford, true);
-        assert_eq!(rules.holland, true);
+        assert!(rules.jacoby);
+        assert!(rules.crawford);
+        assert!(rules.holland);
     }
 
     #[test]
     fn test_with_holland() {
         let rules = Rules::default().with_holland();
-        assert_eq!(rules.crawford, true);
+        assert!(rules.crawford);
     }
 
     #[test]
     fn test_with_raccoon() {
         let rules = Rules::default().with_raccoon();
-        assert_eq!(rules.raccoon, true);
+        assert!(rules.raccoon);
     }
 }
