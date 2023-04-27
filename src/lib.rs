@@ -49,9 +49,13 @@
 
 #![warn(future_incompatible)]
 #![deny(
-    missing_docs,
-    unused_variables,
+    broken_intra_doc_links,
+    invalid_codeblock_attributes,
+    invalid_html_tags,
+    missing_crate_level_docs,
     missing_debug_implementations,
+    missing_docs,
+    private_intra_doc_links,
     single_use_lifetimes,
     trivial_casts,
     trivial_numeric_casts,
@@ -61,6 +65,7 @@
     unused_import_braces,
     unused_qualifications,
     unused_results,
+    unused_variables,
     variant_size_differences
 )] // be tough on code quality
 
