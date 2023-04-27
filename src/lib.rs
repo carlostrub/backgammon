@@ -1,10 +1,9 @@
 //! # Backgammon: The Oldest Board Game of the World
 //! This crate provides a pure, canonical implementation of the game
-//! [*Backgammon*](https://en.wikipedia.org/wiki/Backgammon). It allows to
-//! implement fast Backgammon games in various clients.
+//! [*Backgammon.*](https://en.wikipedia.org/wiki/Backgammon)
 //!
 //! ## Supported Doubling Cube Rules
-//! This library supports the following rules on the doubling cube:
+//! The following [`rules`](`crate::rules::Rules`) on the doubling cube are supported:
 //!
 //! * Beaver
 //! * Raccoon
@@ -14,7 +13,8 @@
 //! * Holland
 //!
 //! ## Examples
-//! Start a new backgammon match over default (3) points and with no extra rules:
+//! Start a new backgammon match over default amount of points and with the default rules, as
+//! defined in [`Rules`](`crate::rules::Rules`):
 //! ```
 //! use backgammon::r#match::Match;
 //!
@@ -27,7 +27,7 @@
 //! use backgammon::rules::SetRules;
 //!
 //! let mut m = Match::new().
-//! with_points(3);
+//! with_points(13);
 //!
 //! ```
 //! Depending on the style of tournament you decide to play, it makes sense to select one or more
