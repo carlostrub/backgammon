@@ -49,13 +49,13 @@
 
 #![warn(future_incompatible)]
 #![deny(
-    broken_intra_doc_links,
-    invalid_codeblock_attributes,
-    invalid_html_tags,
-    missing_crate_level_docs,
+    rustdoc::broken_intra_doc_links,
+    rustdoc::invalid_codeblock_attributes,
+    rustdoc::invalid_html_tags,
+    rustdoc::missing_crate_level_docs,
     missing_debug_implementations,
     missing_docs,
-    private_intra_doc_links,
+    rustdoc::private_intra_doc_links,
     single_use_lifetimes,
     trivial_casts,
     trivial_numeric_casts,
