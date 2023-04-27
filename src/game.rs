@@ -285,4 +285,11 @@ mod tests {
         assert!(g.rules.crawford);
         assert!(g.rules.holland);
     }
+
+    #[test]
+    fn set_rules_test() {
+        let g = Game::default().with_points(5).with_points(3);
+
+        assert_eq!(g.rules.points, 3);
+    }
 }

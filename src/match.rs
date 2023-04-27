@@ -126,4 +126,10 @@ mod tests {
         assert!(m.rules.crawford);
         assert!(m.rules.holland);
     }
+
+    #[test]
+    fn test_set_points() {
+        let m = Match::new().with_points(5).with_points(3);
+        assert_eq!(m.rules.points, 3);
+    }
 }
