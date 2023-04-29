@@ -43,9 +43,8 @@
 //! ```
 //!
 //! ## Discussions and Support
-//! Remember that the APIs are not stable yet. Any support is very welcome. Please use [Bitbucket
-//! Issues](https://bitbucket.org/carlostrub/backgammon/issues?status=new&status=open) to discuss
-//! features or ask for help.
+//! Remember that the APIs are not stable yet. Any support is very welcome. Please open an
+//! [Issue](https://github.com/carlostrub/backgammon/issues) to discuss features or ask for help.
 
 #![warn(future_incompatible)]
 #![deny(
