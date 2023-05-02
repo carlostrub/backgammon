@@ -1,3 +1,11 @@
+//! # Backgammon Game
+//! Start a game by calling `Game::start()`.
+//! ```
+//! use backgammon::game::Game;
+//! let mut g = Game::new().start().unwrap();
+//!
+//! println!("{}", g);
+//! ```
 use crate::error::Error;
 use crate::rules::player::Player;
 use crate::rules::{Rules, SetRules};
