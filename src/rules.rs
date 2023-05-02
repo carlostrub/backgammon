@@ -1,10 +1,11 @@
 /// This module contains all the rules for the game of Backgammon
 pub mod player;
 
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Holds the rules of the match
-#[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Hash)]
+#[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Serialize, Deserialize, Hash)]
 pub struct Rules {
     /// The amount of points to reach for declaring a winner, default is 7.
     pub points: u32,

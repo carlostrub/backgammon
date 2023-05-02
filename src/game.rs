@@ -10,15 +10,23 @@ use crate::error::Error;
 use crate::rules::player::Player;
 use crate::rules::{Rules, SetRules};
 
+use couch_rs::document::TypedCouchDocument;
+use couch_rs::types::document::DocumentId;
+use couch_rs::CouchDocument;
 use rand::distributions::{Distribution, Uniform};
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use uuid::Uuid;
 
 /// Represents a Backgammon game
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Serialize, Deserialize, CouchDocument)]
 pub struct Game {
     /// id of the game
-    id: Uuid,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub _id: DocumentId,
+    /// revision of the game, helps avoiding conflicts
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub _rev: String,
     /// rules of the game
     rules: Rules,
     /// who is the winner?
@@ -47,7 +55,8 @@ pub struct Game {
 impl Default for Game {
     fn default() -> Self {
         Game {
-            id: Uuid::new_v4(),
+            _id: Uuid::new_v4().to_string(),
+            _rev: String::new(),
             rules: Rules::default(),
             winner: Player::Nobody,
             dices: (0, 0),
@@ -72,7 +81,7 @@ impl Default for Game {
 impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = String::new();
-        s.push_str(&format!("Game id: {}\n", self.id));
+        s.push_str(&format!("Game id: {}\n", self._id));
         s.push_str(&format!("Rules: {}\n", self.rules));
         s.push_str(&format!("Winner: {}\n", self.winner));
         s.push_str(&format!("Dices: {:?}\n", self.dices));
@@ -94,7 +103,7 @@ impl Game {
 
     /// Roll the dices which generates two random numbers between 1 and 6, replicating a perfect
     /// dice. We use the operating systems random number generator.
-    pub fn roll(mut self, p: Player) -> Result<Self, Error> {
+    pub fn roll(&mut self, p: Player) -> Result<&mut Self, Error> {
         let between = Uniform::new_inclusive(1, 6);
         let mut rng = rand::thread_rng();
 
@@ -111,18 +120,20 @@ impl Game {
     }
 
     /// Start game by rolling a pair of different numbers to define who begins.
-    pub fn start(self) -> Result<Self, Error> {
+    pub fn start(&mut self) -> Result<&mut Self, Error> {
         loop {
-            let g = self.roll(Player::Nobody);
-            match g {
-                Ok(mut g) => {
-                    if g.dices.0 != g.dices.1 {
-                        if g.dices.0 > g.dices.1 {
-                            g.who_plays = Player::Player1;
+            self.roll(Player::Nobody);
+            // check if dices are different
+
+            match self {
+                Ok(self) => {
+                    if self.dices.0 != self.dices.1 {
+                        if self.dices.0 > self.dices.1 {
+                            self.who_plays = Player::Player1;
                         } else {
-                            g.who_plays = Player::Player2;
+                            self.who_plays = Player::Player2;
                         }
-                        return Ok(g);
+                        return Ok(self);
                     } else {
                         continue;
                     }

@@ -1,9 +1,12 @@
+use serde::{Deserialize, Serialize};
 /// This module contains all the rules for the game of Backgammon
 use std::fmt;
 
 /// Part of the rules of the game is that this game is for only two players. In some cases, nobody
 /// is allowed to move, thus we define this as the default
-#[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Hash, Default)]
+#[derive(
+    Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Hash, Serialize, Deserialize, Default,
+)]
 pub enum Player {
     /// none of the two players, e.g. at start
     #[default]
