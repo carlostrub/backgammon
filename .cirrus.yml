@@ -1,15 +1,15 @@
-container:
-  image: rust:latest
+# only_if: $CIRRUS_TAG == '' && ($CIRRUS_PR != '' || $CIRRUS_BRANCH == 'master' || $CIRRUS_BRANCH =~ 'tokio-.*')
+# auto_cancellation: $CIRRUS_BRANCH != 'master' && $CIRRUS_BRANCH !=~ 'tokio-.*'
+freebsd_instance:
+  image_family: freebsd-13-2
 
-test_task:
-  registry_cache:
-    folder: $CARGO_HOME/registry
-    fingerprint_script: cat Cargo.lock
-  target_cache:
-    folder: target
-    fingerprint_script:
-      - rustc --version
-      - cat Cargo.lock
-  build_script: cargo build
-  test_script: cargo test
-  before_cache_script: rm -rf $CARGO_HOME/registry/index
+# Test FreeBSD in a full VM on cirrus-ci.com.  Test the i686 target too, in the
+# same VM.  The binary will be built in 32-bit mode, but will execute on a
+# 64-bit kernel and in a 64-bit environment.  Our tests don't execute any of
+# the system's binaries, so the environment shouldn't matter.
+task:
+  name: FreeBSD 64-bit
+  setup_script:
+    - pkg install -y rust
+  test_script:
+    - cargo test --all --all-features
