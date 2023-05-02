@@ -287,8 +287,16 @@ mod tests {
     }
 
     #[test]
-    fn set_points_test() {
+    fn set_points_test1() {
         let g = Game::default().with_points(5).with_points(3);
+
+        assert_eq!(g.rules.points, 3);
+    }
+
+    #[test]
+    fn set_points_test2() {
+        let mut g = Game::default().with_points(5);
+        g = g.with_points(3);
 
         assert_eq!(g.rules.points, 3);
     }
