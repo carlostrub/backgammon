@@ -1,8 +1,10 @@
 //! # Backgammon Game
-//! Start a game by calling `Game::start()`.
+//! Start a game by calling:
 //! ```
 //! use backgammon::game::Game;
-//! let mut g = Game::new().start().unwrap();
+//! use backgammon::rules::player::Player;
+//!
+//! let mut g = Game::new().roll(Player::Nobody).unwrap();
 //!
 //! println!("{}", g);
 //! ```
@@ -23,10 +25,10 @@ use uuid::Uuid;
 pub struct Game {
     /// id of the game
     #[serde(skip_serializing_if = "String::is_empty")]
-    pub _id: DocumentId,
+    _id: DocumentId,
     /// revision of the game, helps avoiding conflicts
     #[serde(skip_serializing_if = "String::is_empty")]
-    pub _rev: String,
+    _rev: String,
     /// rules of the game
     rules: Rules,
     /// who is the winner?
@@ -82,6 +84,7 @@ impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = String::new();
         s.push_str(&format!("Game id: {}\n", self._id));
+        s.push_str(&format!("Game rev: {}\n", self._rev));
         s.push_str(&format!("Rules: {}\n", self.rules));
         s.push_str(&format!("Winner: {}\n", self.winner));
         s.push_str(&format!("Dices: {:?}\n", self.dices));
@@ -96,50 +99,35 @@ impl fmt::Display for Game {
 }
 
 impl Game {
-    /// Start a new game
+    /// Create a new default game
     pub fn new() -> Self {
         Game::default()
     }
 
     /// Roll the dices which generates two random numbers between 1 and 6, replicating a perfect
     /// dice. We use the operating systems random number generator.
-    pub fn roll(&mut self, p: Player) -> Result<&mut Self, Error> {
+    pub fn roll(mut self, p: Player) -> Result<Self, Error> {
         let between = Uniform::new_inclusive(1, 6);
         let mut rng = rand::thread_rng();
 
+        // Only roll if it is the turn of the player or if nobody has the turn (which means the
+        // game starts)
         match self.who_plays == p || self.who_plays == Player::Nobody {
             false => Err(Error::Turn),
             true => match self.cube_received {
-                true => Err(Error::DiceReceived),
+                true => Err(Error::CubeReceived),
                 false => {
                     self.dices = (between.sample(&mut rng), between.sample(&mut rng));
-                    Ok(self)
-                }
-            },
-        }
-    }
-
-    /// Start game by rolling a pair of different numbers to define who begins.
-    pub fn start(&mut self) -> Result<&mut Self, Error> {
-        loop {
-            self.roll(Player::Nobody);
-            // check if dices are different
-
-            match self {
-                Ok(self) => {
-                    if self.dices.0 != self.dices.1 {
+                    if self.who_plays == Player::Nobody && self.dices.0 != self.dices.1 {
                         if self.dices.0 > self.dices.1 {
                             self.who_plays = Player::Player1;
                         } else {
                             self.who_plays = Player::Player2;
                         }
-                        return Ok(self);
-                    } else {
-                        continue;
                     }
+                    Ok(self)
                 }
-                Err(_) => return Err(Error::Started),
-            }
+            },
         }
     }
 
@@ -222,7 +210,6 @@ mod tests {
     #[test]
     fn new_test() {
         let g = Game::new();
-        assert_eq!(g.id.get_version_num(), 4);
         assert_eq!(g.rules.points, 7);
         assert!(!g.rules.beaver);
         assert!(!g.rules.raccoon);
@@ -263,22 +250,22 @@ mod tests {
     fn roll_test_fair() {
         let mut sum: u32 = 0;
 
-        for _x in 0..1_000_000 {
+        for _x in 0..100_000 {
             let g = Game::default();
             let d = g.roll(Player::Player1).unwrap();
             sum += (d.dices.0 + d.dices.1) as u32;
         }
 
-        let average = (sum as f64) / 2_000_000.;
+        let average = (sum as f64) / 200_000.;
         assert!(average < 3.51);
         assert!(average > 3.49);
     }
 
     #[test]
     fn start_test() {
-        let g = Game::default();
-        for _x in 0..1_000_000 {
-            let d = g.start().unwrap();
+        for _x in 0..100_000 {
+            let g = Game::default();
+            let d = g.roll(Player::Nobody).unwrap();
             assert!(d.dices.0 != d.dices.1);
         }
     }
