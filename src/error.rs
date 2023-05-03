@@ -10,8 +10,8 @@ pub enum Error {
     Ended,
     /// Opponent is playing
     Turn,
-    /// Opponent offered dice. Need to react on this event first.
-    DiceReceived,
+    /// Opponent offered doubling cube. Need to react on this event first.
+    CubeReceived,
     /// Doubling not permitted
     Double,
 }
@@ -26,7 +26,7 @@ impl fmt::Display for Error {
             Error::Started => write!(f, "Game has already started"),
             Error::Ended => write!(f, "Game has already ended"),
             Error::Turn => write!(f, "Opponent's turn"),
-            Error::DiceReceived => {
+            Error::CubeReceived => {
                 write!(
                     f,
                     "Opponent offered dice. Need to first accept or decline the doubling dice."
