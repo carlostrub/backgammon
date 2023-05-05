@@ -41,6 +41,10 @@
 //! with_jacoby();
 //!
 //! ```
+//! ## Design Philosophy
+//! This library is desigend to offer completely stateless game functions. This means that it
+//! should be easy to implement easily wrappers using this library in combination with some
+//! database to store the game state.
 //!
 //! ## Discussions and Support
 //! Remember that the APIs are not stable yet. Any support is very welcome. Please open an

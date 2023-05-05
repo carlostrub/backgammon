@@ -17,6 +17,12 @@ cargo build -v
 echo "Running tests..."
 cargo test -v --no-fail-fast
 
+# Running tests
+echo "Create the documentation..."
+cargo doc
+rm -r /usr/local/www/backgammon/doc
+cp -r target/doc /usr/local/www/backgammon/
+
 # Checking coverage
 #echo "Checking coverage..."
 #cargo-tarpaulin
