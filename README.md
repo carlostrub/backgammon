@@ -2,7 +2,7 @@
 
 # backgammon
 
-## Backgammon: The Oldest Board Game of the World
+## Backgammon: The Oldest Board Game in the World
 This crate provides a pure, canonical implementation of the game
 [*Backgammon.*](https://en.wikipedia.org/wiki/Backgammon)
 
@@ -17,7 +17,7 @@ The following [`rules`](`crate::rules::Rules`) on the doubling cube are supporte
 * Holland
 
 ### Examples
-Start a new backgammon match over default amount of points and with the default rules, as
+Start a new backgammon match over the default amount of points and with the default rules, as
 defined in [`Rules`](`crate::rules::Rules`):
 ```rust
 use backgammon::r#match::Match;
@@ -47,7 +47,7 @@ with_jacoby();
 ```
 ### Design Philosophy
 This library is designed to offer completely stateless game functions. This means that it
-should be easy to implement wrappers using this library in combination with some database to
+should be easy to implement wrappers using this library in combination with some databases to
 store the game state.
 
 ### Discussions and Support
