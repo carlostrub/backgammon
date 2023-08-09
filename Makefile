@@ -4,7 +4,16 @@
 # Usage: make readme
 #
 
+all: readme doc
+
+.PHONY: readme
 readme:
 	cargo readme > README.md
 
-.PHONY: readme
+.PHONY: doc
+doc:
+	cargo doc
+	cp -r target/doc /usr/local/www/backgammon/doc;
+
+clean: 
+	rm -r /usr/local/www/backgammon/doc;

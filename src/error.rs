@@ -1,19 +1,21 @@
 /// This module contains the error definition for the Backgammon game.
 use std::fmt;
 
-/// We represent all Backgammon errors as an enum
+/// Holds all possible errors that can occur during a Backgammon game.
 #[derive(Debug)]
 pub enum Error {
     /// Game has already started
     Started,
     /// Game has already ended
     Ended,
-    /// Opponent is playing
+    /// Opponent is playing, not your turn.
     Turn,
     /// Opponent offered doubling cube. Need to react on this event first.
     CubeReceived,
     /// Doubling not permitted
     Double,
+    /// Invalid cube value
+    InvalidCubeValue,
 }
 
 // implement Error trait
@@ -33,6 +35,7 @@ impl fmt::Display for Error {
                 )
             }
             Error::Double => write!(f, "Doubling not permitted"),
+            Error::InvalidCubeValue => write!(f, "Invalid cube value"),
         }
     }
 }

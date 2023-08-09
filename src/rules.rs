@@ -1,10 +1,17 @@
-/// This module contains all the rules for the game of Backgammon
-pub mod player;
+/// Implements the board
+pub(crate) mod board;
+pub use board::Board;
+/// Implements the double dice or cube
+pub(crate) mod cube;
+pub use cube::Cube;
+/// Implements the players
+pub(crate) mod player;
+pub use player::Player;
 
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-/// Holds the rules of the match
+/// Holds all the rule settings
 #[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Serialize, Deserialize, Hash)]
 pub struct Rules {
     /// The amount of points to reach for declaring a winner, default is 7.
@@ -56,7 +63,7 @@ impl fmt::Display for Rules {
     }
 }
 
-/// SetRules allows to modify the rules
+/// Allows to modify the rules
 pub trait SetRules {
     /// Set the amount of points to reach for declaring a winner
     fn with_points(self, points: u32) -> Self;

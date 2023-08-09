@@ -10,13 +10,11 @@ repository = "https://github.com/carlostrub/backgammon"
 license = "BSD-2-Clause"
 keywords = ["backgammon","gamedev"]
 categories = ["game-development"]
+exclude = ["Makefile"]
 
 [badges]
-bitbucket-pipelines = { repository = "carlostrub/backgammon", branch = "master" }
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-couch_rs = "0.9.2"
 rand = "0.8"
-serde = "1.0.160"
-uuid = { version = "1.2.1", features = ["v4"] }
+serde = { version = "1.0", features = ["derive"] }

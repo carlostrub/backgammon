@@ -2,13 +2,11 @@ use crate::game::Game;
 use crate::rules::{Rules, SetRules};
 
 use std::fmt;
-use uuid::Uuid;
 
 /// A Backgammon match consists of an Id (to be used in applications calling this library), a set
 /// of rules and a vector of games
 #[derive(Debug, Clone)]
 pub struct Match {
-    id: Uuid,
     /// The rules set for the match
     pub rules: Rules,
     games: Vec<Game>,
@@ -17,7 +15,6 @@ pub struct Match {
 impl Default for Match {
     fn default() -> Self {
         Match {
-            id: Uuid::new_v4(),
             rules: Rules::default(),
             games: Vec::new(),
         }
@@ -27,7 +24,11 @@ impl Default for Match {
 // implement Display trait
 impl fmt::Display for Match {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Match: {}, Games: {:?}", self.id, self.games)
+        write!(
+            f,
+            "Match with rules: {:?} and Games: {:?}",
+            self.rules, self.games
+        )
     }
 }
 

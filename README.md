@@ -54,4 +54,7 @@ store the game state.
 Remember that the APIs are not stable yet. Any support is very welcome. Please open an
 [Issue](https://github.com/carlostrub/backgammon/issues) to discuss features or ask for help.
 
+You can also find me on:
+IRC: [#backgammon @ libera.chat](ircs://irc.libera.chat/#backgammon)
+
 License: BSD-2-Clause

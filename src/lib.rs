@@ -49,6 +49,9 @@
 //! ## Discussions and Support
 //! Remember that the APIs are not stable yet. Any support is very welcome. Please open an
 //! [Issue](https://github.com/carlostrub/backgammon/issues) to discuss features or ask for help.
+//!
+//! You can also find me on:
+//! IRC: [#backgammon @ libera.chat](ircs://irc.libera.chat/#backgammon)
 
 #![warn(future_incompatible)]
 #![deny(
@@ -72,13 +75,14 @@
     variant_size_differences
 )] // be tough on code quality
 
-/// Implements all Backgammon rules
-mod error;
+/// Implements all possible Backgammon errors
+pub(crate) mod error;
+pub use error::Error;
 /// Implements a Backgammon game
 pub mod game;
 /// Implements a Backgammon match
 pub mod r#match;
-/// Implements all Backgammon rules
+/// Implements the board, the dices, the cube, and all other Backgammon rules
 pub mod rules;
 
 //#[cfg(test)]

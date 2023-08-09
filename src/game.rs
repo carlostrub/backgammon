@@ -9,47 +9,34 @@
 //! println!("{}", g);
 //! ```
 use crate::error::Error;
+use crate::rules::board::Board;
+use crate::rules::cube::Cube;
 use crate::rules::player::Player;
 use crate::rules::{Rules, SetRules};
 
-use couch_rs::document::TypedCouchDocument;
-use couch_rs::types::document::DocumentId;
-use couch_rs::CouchDocument;
 use rand::distributions::{Distribution, Uniform};
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use uuid::Uuid;
 
 /// Represents a Backgammon game
-#[derive(Debug, Clone, Serialize, Deserialize, CouchDocument)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Game {
-    /// id of the game
-    #[serde(skip_serializing_if = "String::is_empty")]
-    _id: DocumentId,
-    /// revision of the game, helps avoiding conflicts
-    #[serde(skip_serializing_if = "String::is_empty")]
-    _rev: String,
     /// rules of the game
-    rules: Rules,
-    /// who is the winner?
-    winner: Player,
+    pub rules: Rules,
     /// last dice pair rolled
-    dices: (u8, u8),
+    pub dices: (u8, u8),
     /// whose turn is it?
-    who_plays: Player,
-    /// a board has 24 fields, the second tuple is the bar for Player 1 and 2, the third tuple is
-    /// the off for Player 1 and 2
-    board: ([i8; 24], (u8, u8), (u8, u8)),
-    /// cube displays the n-th power of 2, e.g. 2 -> 2^2 = 4
-    cube: u8,
-    /// who holds the cube
-    cube_owner: Player,
+    pub who_plays: Player,
+    /// board for player 0 and 1
+    board: Board,
+    /// cube value and owner
+    cube: Cube,
     /// was cube offered to the one who plays?
-    cube_received: bool,
-    // Crawford rule: if crawford game, no doubling allowed
-    crawford: bool,
-    // Holland rule: if <4 rolls of crawford game, no doubling allowed
-    since_crawford: u8,
+    pub cube_received: bool,
+    /// Crawford rule: if crawford game, no doubling allowed
+    pub crawford: bool,
+    /// Holland rule: if <4 rolls of crawford game, no doubling allowed
+    pub since_crawford: u8,
 }
 
 // Backgammon uses 15 checkers per side
@@ -57,21 +44,11 @@ pub struct Game {
 impl Default for Game {
     fn default() -> Self {
         Game {
-            _id: Uuid::new_v4().to_string(),
-            _rev: String::new(),
             rules: Rules::default(),
-            winner: Player::Nobody,
             dices: (0, 0),
-            cube: 0,
-            cube_owner: Player::Nobody,
+            cube: Cube::default(),
             who_plays: Player::Nobody,
-            board: (
-                [
-                    2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2,
-                ],
-                (0, 0),
-                (0, 0),
-            ),
+            board: Board::default(),
             cube_received: false,
             crawford: false,
             since_crawford: 0,
@@ -83,13 +60,11 @@ impl Default for Game {
 impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = String::new();
-        s.push_str(&format!("Game id: {}\n", self._id));
-        s.push_str(&format!("Game rev: {}\n", self._rev));
         s.push_str(&format!("Rules: {}\n", self.rules));
-        s.push_str(&format!("Winner: {}\n", self.winner));
+        //  s.push_str(&format!("Winner: {}\n", self.winner()));
         s.push_str(&format!("Dices: {:?}\n", self.dices));
-        s.push_str(&format!("Cube: {}\n", self.cube));
-        s.push_str(&format!("Cube owner: {}\n", self.cube_owner));
+        s.push_str(&format!("Cube: {}\n", self.cube.value()));
+        s.push_str(&format!("Cube owner: {}\n", self.cube.owner()));
         s.push_str(&format!("Who plays: {}\n", self.who_plays));
         s.push_str(&format!("Board: {:?}\n", self.board));
         s.push_str(&format!("Crawford: {}\n", self.crawford));
@@ -103,6 +78,9 @@ impl Game {
     pub fn new() -> Self {
         Game::default()
     }
+
+    // Winner of the game
+    //pub fn winner(&self) -> Player {}
 
     /// Roll the dices which generates two random numbers between 1 and 6, replicating a perfect
     /// dice. We use the operating systems random number generator.
@@ -120,9 +98,9 @@ impl Game {
                     self.dices = (between.sample(&mut rng), between.sample(&mut rng));
                     if self.who_plays == Player::Nobody && self.dices.0 != self.dices.1 {
                         if self.dices.0 > self.dices.1 {
-                            self.who_plays = Player::Player1;
+                            self.who_plays = Player::Player0;
                         } else {
-                            self.who_plays = Player::Player2;
+                            self.who_plays = Player::Player1;
                         }
                     }
                     Ok(self)
@@ -239,7 +217,7 @@ mod tests {
     #[test]
     fn roll_test() {
         let g = Game::default();
-        let d = g.roll(Player::Player1).unwrap();
+        let d = g.roll(Player::Player0).unwrap();
         assert!(d.dices.0 > 0);
         assert!(d.dices.0 < 7);
         assert!(d.dices.1 > 0);
@@ -252,7 +230,7 @@ mod tests {
 
         for _x in 0..100_000 {
             let g = Game::default();
-            let d = g.roll(Player::Player1).unwrap();
+            let d = g.roll(Player::Player0).unwrap();
             sum += (d.dices.0 + d.dices.1) as u32;
         }
 
