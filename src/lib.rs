@@ -51,7 +51,9 @@
 //! [Issue](https://github.com/carlostrub/backgammon/issues) to discuss features or ask for help.
 //!
 //! You can also find me on:
-//! IRC: [#backgammon @ libera.chat](ircs://irc.libera.chat/#backgammon)
+//!
+//! IRC: [#backgammon @ libera.chat](ircs://irc.libera.chat/#backgammon) (via
+//! [webchat](https://web.libera.chat/#backgammon))
 
 #![warn(future_incompatible)]
 #![deny(

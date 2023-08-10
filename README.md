@@ -55,6 +55,8 @@ Remember that the APIs are not stable yet. Any support is very welcome. Please o
 [Issue](https://github.com/carlostrub/backgammon/issues) to discuss features or ask for help.
 
 You can also find me on:
-IRC: [#backgammon @ libera.chat](ircs://irc.libera.chat/#backgammon)
+
+IRC: [#backgammon @ libera.chat](ircs://irc.libera.chat/#backgammon) (via
+[webchat](https://web.libera.chat/#backgammon))
 
 License: BSD-2-Clause
