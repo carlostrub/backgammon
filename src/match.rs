@@ -5,20 +5,12 @@ use std::fmt;
 
 /// A Backgammon match consists of an Id (to be used in applications calling this library), a set
 /// of rules and a vector of games
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Match {
     /// The rules set for the match
     pub rules: Rules,
-    games: Vec<Game>,
-}
-
-impl Default for Match {
-    fn default() -> Self {
-        Match {
-            rules: Rules::default(),
-            games: Vec::new(),
-        }
-    }
+    /// The games played in the match
+    pub games: Vec<Game>,
 }
 
 // implement Display trait
@@ -97,7 +89,6 @@ mod tests {
         let m = Match::default();
         assert_eq!(m.rules, Rules::default());
         assert_eq!(m.games.len(), 0);
-        assert_eq!(m.id.get_version_num(), 4);
     }
 
     #[test]
@@ -105,7 +96,6 @@ mod tests {
         let m = Match::new();
         assert_eq!(m.rules, Rules::default());
         assert_eq!(m.games.len(), 0);
-        assert_eq!(m.id.get_version_num(), 4);
     }
 
     #[test]

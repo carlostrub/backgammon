@@ -32,7 +32,7 @@ impl Cube {
     pub fn set(&mut self, value: u64) -> Result<u64, Error> {
         if value.is_power_of_two() {
             let vf = value as f64;
-            self.exponential = vf.sqrt() as u8;
+            self.exponential = vf.sqrt().round() as u8;
 
             Ok(2 ^ self.exponential as u64)
         } else {

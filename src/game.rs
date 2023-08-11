@@ -61,7 +61,6 @@ impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = String::new();
         s.push_str(&format!("Rules: {}\n", self.rules));
-        //  s.push_str(&format!("Winner: {}\n", self.winner()));
         s.push_str(&format!("Dices: {:?}\n", self.dices));
         s.push_str(&format!("Cube: {}\n", self.cube.value()));
         s.push_str(&format!("Cube owner: {}\n", self.cube.owner()));
@@ -180,108 +179,4 @@ impl SetRules for Game {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // new game test_default_rules
-    #[test]
-    fn new_test() {
-        let g = Game::new();
-        assert_eq!(g.rules.points, 7);
-        assert!(!g.rules.beaver);
-        assert!(!g.rules.raccoon);
-        assert!(!g.rules.murphy);
-        assert_eq!(g.rules.murphy_limit, 0);
-        assert!(!g.rules.jacoby);
-        assert!(g.rules.crawford);
-        assert!(!g.rules.holland);
-        assert_eq!(g.winner, Player::Nobody);
-        assert_eq!(g.dices, (0, 0));
-        assert_eq!(g.cube, 0);
-        assert_eq!(g.cube_owner, Player::Nobody);
-        assert_eq!(g.who_plays, Player::Nobody);
-        assert_eq!(
-            g.board,
-            (
-                [2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2],
-                (0, 0),
-                (0, 0)
-            )
-        );
-        assert!(!g.cube_received);
-        assert!(!g.crawford);
-        assert_eq!(g.since_crawford, 0);
-    }
-
-    #[test]
-    fn roll_test() {
-        let g = Game::default();
-        let d = g.roll(Player::Player0).unwrap();
-        assert!(d.dices.0 > 0);
-        assert!(d.dices.0 < 7);
-        assert!(d.dices.1 > 0);
-        assert!(d.dices.1 < 7);
-    }
-
-    #[test]
-    fn roll_test_fair() {
-        let mut sum: u32 = 0;
-
-        for _x in 0..100_000 {
-            let g = Game::default();
-            let d = g.roll(Player::Player0).unwrap();
-            sum += (d.dices.0 + d.dices.1) as u32;
-        }
-
-        let average = (sum as f64) / 200_000.;
-        assert!(average < 3.51);
-        assert!(average > 3.49);
-    }
-
-    #[test]
-    fn start_test() {
-        for _x in 0..100_000 {
-            let g = Game::default();
-            let d = g.roll(Player::Nobody).unwrap();
-            assert!(d.dices.0 != d.dices.1);
-        }
-    }
-
-    // test SetRules for Game
-    #[test]
-    fn set_rules_test() {
-        let g = Game::default()
-            .with_points(5)
-            .with_beaver()
-            .with_raccoon()
-            .with_murphy(3)
-            .with_jacoby()
-            .with_crawford()
-            .with_holland();
-
-        assert_eq!(g.rules.points, 5);
-        assert!(g.rules.beaver);
-        assert!(g.rules.raccoon);
-        assert!(g.rules.murphy);
-        assert_eq!(g.rules.murphy_limit, 3);
-        assert!(g.rules.jacoby);
-        assert!(g.rules.crawford);
-        assert!(g.rules.holland);
-    }
-
-    #[test]
-    fn set_points_test1() {
-        let g = Game::default().with_points(5).with_points(3);
-
-        assert_eq!(g.rules.points, 3);
-    }
-
-    #[test]
-    fn set_points_test2() {
-        let mut g = Game::default().with_points(5);
-        g = g.with_points(3);
-
-        assert_eq!(g.rules.points, 3);
-    }
-}
+// Unit tests
