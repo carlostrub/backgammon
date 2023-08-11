@@ -16,6 +16,8 @@ pub enum Error {
     Double,
     /// Invalid cube value
     InvalidCubeValue,
+    /// Invalid player
+    InvalidPlayer,
 }
 
 // implement Error trait
@@ -36,6 +38,7 @@ impl fmt::Display for Error {
             }
             Error::Double => write!(f, "Doubling not permitted"),
             Error::InvalidCubeValue => write!(f, "Invalid cube value"),
+            Error::InvalidPlayer => write!(f, "Invalid player"),
         }
     }
 }

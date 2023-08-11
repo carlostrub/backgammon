@@ -1,6 +1,7 @@
 /// Implements the board
 pub(crate) mod board;
 pub use board::Board;
+pub use board::BoardDisplay;
 /// Implements the double dice or cube
 pub(crate) mod cube;
 pub use cube::Cube;
