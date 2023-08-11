@@ -13,7 +13,9 @@ readme:
 .PHONY: doc
 doc:
 	cargo doc
-	cp -r target/doc /usr/local/www/backgammon/doc;
+	rm -r /usr/local/www/backgammon/doc/backgammon;
+	cp -r target/doc/backgammon /usr/local/www/backgammon/doc/backgammon;
 
-clean: 
+doc-all:
 	rm -r /usr/local/www/backgammon/doc;
+	cp -r target/doc /usr/local/www/backgammon/doc;
