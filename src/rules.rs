@@ -1,12 +1,12 @@
 /// Implements the board
-pub(crate) mod board;
+mod board;
 pub use board::Board;
 pub use board::BoardDisplay;
 /// Implements the double dice or cube
-pub(crate) mod cube;
+mod cube;
 pub use cube::Cube;
 /// Implements the players
-pub(crate) mod player;
+mod player;
 pub use player::Player;
 
 use serde::{Deserialize, Serialize};

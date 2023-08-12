@@ -2,16 +2,16 @@
 //! Start a game by calling:
 //! ```
 //! use backgammon::game::Game;
-//! use backgammon::rules::player::Player;
+//! use backgammon::rules::Player;
 //!
 //! let mut g = Game::new().roll(Player::Nobody).unwrap();
 //!
 //! println!("{}", g);
 //! ```
 use crate::error::Error;
-use crate::rules::board::Board;
-use crate::rules::cube::Cube;
-use crate::rules::player::Player;
+use crate::rules::Board;
+use crate::rules::Cube;
+use crate::rules::Player;
 use crate::rules::{Rules, SetRules};
 
 use rand::distributions::{Distribution, Uniform};
@@ -90,7 +90,7 @@ impl Game {
         // Only roll if it is the turn of the player or if nobody has the turn (which means the
         // game starts)
         match self.who_plays == p || self.who_plays == Player::Nobody {
-            false => Err(Error::Turn),
+            false => Err(Error::PlayerTurn),
             true => match self.cube_received {
                 true => Err(Error::CubeReceived),
                 false => {

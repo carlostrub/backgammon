@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::rules::player::Player;
+use crate::rules::Player;
 use serde::{Deserialize, Serialize};
 
 /// Represents a Backgammon cube (doubling cube).
@@ -17,7 +17,7 @@ pub struct Cube {
 impl Cube {
     /// Returns the value of the cube
     pub fn value(&self) -> u64 {
-        2 ^ self.exponential as u64
+        2u64.pow(self.exponential as u32)
     }
 
     /// Returns the owner of the cube
@@ -29,14 +29,14 @@ impl Cube {
     ///
     /// Internally, we store the value of the cube as an exponent of 2 as u8. Therefore there is a
     /// technical limit of 2^64 on the value of the cube, which we believe is a reasonable limit.
-    pub fn set(&mut self, value: u64) -> Result<u64, Error> {
+    pub fn set(&mut self, value: u64) -> Result<(), Error> {
         if value.is_power_of_two() {
             let vf = value as f64;
             self.exponential = vf.sqrt().round() as u8;
 
-            Ok(2 ^ self.exponential as u64)
+            Ok(())
         } else {
-            Err(Error::InvalidCubeValue)
+            Err(Error::CubeValueInvalid)
         }
     }
 
@@ -48,9 +48,9 @@ impl Cube {
     /// Calculate the next value of the cube to offer it to the opponent
     pub fn offer(&self, opponent: Player) -> Result<u64, Error> {
         if self.owner == Player::Nobody || self.owner != opponent {
-            Ok(2 ^ self.exponential as u64)
+            Ok(2u64.pow(1 + self.exponential as u32))
         } else {
-            Err(Error::Double)
+            Err(Error::DoubleNotPermitted)
         }
     }
 }
@@ -68,7 +68,7 @@ mod tests {
     #[test]
     fn set_value2() -> Result<(), Error> {
         let mut cube = Cube::default();
-        assert_eq!(cube.set(2)?, 2);
+        cube.set(2)?;
         assert_eq!(cube.value(), 2);
         Ok(())
     }
@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn set_value4() -> Result<(), Error> {
         let mut cube = Cube::default();
-        assert_eq!(cube.set(4)?, 4);
+        cube.set(4)?;
         assert_eq!(cube.value(), 4);
         Ok(())
     }
@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn set_value8() -> Result<(), Error> {
         let mut cube = Cube::default();
-        assert_eq!(cube.set(8)?, 8);
+        cube.set(8)?;
         assert_eq!(cube.value(), 8);
         Ok(())
     }
@@ -92,7 +92,7 @@ mod tests {
     #[test]
     fn set_value16() -> Result<(), Error> {
         let mut cube = Cube::default();
-        assert_eq!(cube.set(16)?, 16);
+        cube.set(16)?;
         assert_eq!(cube.value(), 16);
         Ok(())
     }
@@ -118,20 +118,22 @@ mod tests {
     }
 
     #[test]
-    fn offer() {
-        let mut cube = Cube::default();
-        cube.offer(Player::Player1);
-        assert_eq!(cube.owner(), Player::Player0);
-        assert_eq!(cube.value(), 2);
+    fn offer0() -> Result<(), Error> {
+        let cube = Cube::default();
+        let offer = cube.offer(Player::Player1)?;
+        assert_eq!(offer, 2);
+        Ok(())
     }
 
     #[test]
-    fn offer1() {
+    fn offer1() -> Result<(), Error> {
         let mut cube = Cube::default();
-        cube.set(2);
-        cube.set_owner(Player::Player1);
-        cube.offer(Player::Player1);
+        cube.set(2)?;
+        cube.set_owner(Player::Player0);
+        let offer = cube.offer(Player::Player1)?;
         assert_eq!(cube.owner(), Player::Player0);
-        assert_eq!(cube.value(), 8);
+        assert_eq!(cube.value(), 2);
+        assert_eq!(offer, 4);
+        Ok(())
     }
 }

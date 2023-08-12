@@ -5,19 +5,23 @@ use std::fmt;
 #[derive(Debug)]
 pub enum Error {
     /// Game has already started
-    Started,
+    GameStarted,
     /// Game has already ended
-    Ended,
+    GameEnded,
     /// Opponent is playing, not your turn.
-    Turn,
+    PlayerTurn,
     /// Opponent offered doubling cube. Need to react on this event first.
     CubeReceived,
     /// Doubling not permitted
-    Double,
+    DoubleNotPermitted,
     /// Invalid cube value
-    InvalidCubeValue,
+    CubeValueInvalid,
     /// Invalid player
-    InvalidPlayer,
+    PlayerInvalid,
+    /// Field blocked
+    FieldBlocked,
+    /// Invalid field
+    FieldInvalid,
 }
 
 // implement Error trait
@@ -27,18 +31,20 @@ impl std::error::Error for Error {}
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Error::Started => write!(f, "Game has already started"),
-            Error::Ended => write!(f, "Game has already ended"),
-            Error::Turn => write!(f, "Opponent's turn"),
+            Error::GameStarted => write!(f, "Game has already started"),
+            Error::GameEnded => write!(f, "Game has already ended"),
+            Error::PlayerTurn => write!(f, "Opponent's turn"),
+            Error::PlayerInvalid => write!(f, "Invalid player"),
             Error::CubeReceived => {
                 write!(
                     f,
                     "Opponent offered dice. Need to first accept or decline the doubling dice."
                 )
             }
-            Error::Double => write!(f, "Doubling not permitted"),
-            Error::InvalidCubeValue => write!(f, "Invalid cube value"),
-            Error::InvalidPlayer => write!(f, "Invalid player"),
+            Error::CubeValueInvalid => write!(f, "Invalid cube value"),
+            Error::DoubleNotPermitted => write!(f, "Doubling not permitted"),
+            Error::FieldBlocked => write!(f, "Field blocked"),
+            Error::FieldInvalid => write!(f, "Invalid field"),
         }
     }
 }

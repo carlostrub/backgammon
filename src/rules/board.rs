@@ -13,7 +13,7 @@ pub struct Board {
 }
 
 /// Represents the Backgammon board for both players (to be used for graphical representation).
-#[derive(Debug, Clone, Serialize, PartialEq, Deserialize, Default)]
+#[derive(Debug, Serialize, PartialEq, Deserialize)]
 pub struct BoardDisplay {
     /// The board represented as an array of 24 fields, each of which can hold 0 or more checkers.
     /// Positive amounts represent checkers of player 0, negative amounts represent checkers of
@@ -44,7 +44,7 @@ impl Board {
         let mut board: [i8; 24] = [0; 24];
 
         for (i, val) in board.iter_mut().enumerate() {
-            *val = self.raw_board.0.board[i] as i8 - self.raw_board.1.board[i] as i8;
+            *val = self.raw_board.0.board[i] as i8 - self.raw_board.1.board[23 - i] as i8;
         }
 
         BoardDisplay {
@@ -65,17 +65,61 @@ impl Board {
     }
 
     /// Set checkers for a player on a field
-    pub fn set(&mut self, player: Player, field: u8, amount: u8) -> Result<(), Error> {
+    ///
+    /// This method sets the amount of checkers for a player on a field. The field is numbered from
+    /// 0 to 23, starting from the last field of each player in the home board, the most far away
+    /// field for each player (where there are 2 checkers to start with) is number 23.
+    ///
+    /// If the field is blocked for the player, an error is returned. If the field is not blocked,
+    /// but there is already one checker from the other player on the field, the checker is hit and
+    /// moved to the bar.
+    pub fn set(&mut self, player: Player, field: usize, amount: u8) -> Result<(), Error> {
+        if self.blocked(player, field)? {
+            return Err(Error::FieldBlocked);
+        }
+        if field > 23 {
+            return Err(Error::FieldInvalid);
+        }
+
         match player {
             Player::Player0 => {
-                self.raw_board.0.board[field as usize] = amount;
+                self.raw_board.0.board[field] = amount;
+                self.raw_board.1.bar += self.raw_board.1.board[23 - field];
+                self.raw_board.1.board[23 - field] = 0;
                 Ok(())
             }
             Player::Player1 => {
-                self.raw_board.1.board[field as usize] = amount;
+                self.raw_board.1.board[field] = amount;
+                self.raw_board.0.bar += self.raw_board.0.board[23 - field];
+                self.raw_board.0.board[23 - field] = 0;
                 Ok(())
             }
-            Player::Nobody => Err(Error::InvalidPlayer),
+            Player::Nobody => Err(Error::PlayerInvalid),
+        }
+    }
+
+    /// Check if a field is blocked for a player
+    pub fn blocked(&self, player: Player, field: usize) -> Result<bool, Error> {
+        if field > 23 {
+            return Err(Error::FieldInvalid);
+        }
+
+        match player {
+            Player::Player0 => {
+                if self.raw_board.1.board[23 - field] > 1 {
+                    Ok(true)
+                } else {
+                    Ok(false)
+                }
+            }
+            Player::Player1 => {
+                if self.raw_board.0.board[23 - field] > 1 {
+                    Ok(true)
+                } else {
+                    Ok(false)
+                }
+            }
+            Player::Nobody => Err(Error::PlayerInvalid),
         }
     }
 
@@ -90,7 +134,7 @@ impl Board {
                 self.raw_board.1.bar = amount;
                 Ok(())
             }
-            Player::Nobody => Err(Error::InvalidPlayer),
+            Player::Nobody => Err(Error::PlayerInvalid),
         }
     }
 
@@ -105,7 +149,7 @@ impl Board {
                 self.raw_board.1.off = amount;
                 Ok(())
             }
-            Player::Nobody => Err(Error::InvalidPlayer),
+            Player::Nobody => Err(Error::PlayerInvalid),
         }
     }
 }
@@ -153,24 +197,14 @@ mod tests {
     }
 
     #[test]
-    fn default_board_display() {
-        assert_eq!(
-            BoardDisplay::default(),
-            BoardDisplay {
-                board: [0, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-                bar: (0, 0),
-                off: (0, 0)
-            }
-        );
-    }
-
-    #[test]
     fn get_board() {
         let board = Board::new();
         assert_eq!(
             board.get(),
             BoardDisplay {
-                board: [0, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
+                board: [
+                    -2, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, -5, 5, 0, 0, 0, -3, 0, -5, 0, 0, 0, 0, 2,
+                ],
                 bar: (0, 0),
                 off: (0, 0)
             }
@@ -192,16 +226,16 @@ mod tests {
     #[test]
     fn set_player0() -> Result<(), Error> {
         let mut board = Board::new();
-        board.set(Player::Player0, 0, 1)?;
-        assert_eq!(board.get().board[0], 1);
+        board.set(Player::Player0, 1, 1)?;
+        assert_eq!(board.get().board[1], 1);
         Ok(())
     }
 
     #[test]
     fn set_player1() -> Result<(), Error> {
         let mut board = Board::new();
-        board.set(Player::Player1, 0, 1)?;
-        assert_eq!(board.get().board[23], -1);
+        board.set(Player::Player1, 2, 1)?;
+        assert_eq!(board.get().board[21], -1);
         Ok(())
     }
 
@@ -243,5 +277,89 @@ mod tests {
         assert!(board.set(Player::Nobody, 0, 1).is_err());
         assert!(board.set_bar(Player::Nobody, 1).is_err());
         assert!(board.set_off(Player::Nobody, 1).is_err());
+    }
+
+    #[test]
+    fn blocked_player0() -> Result<(), Error> {
+        let board = Board::new();
+        assert!(board.blocked(Player::Player0, 0)?);
+        Ok(())
+    }
+
+    #[test]
+    fn blocked_player1() -> Result<(), Error> {
+        let board = Board::new();
+        assert!(board.blocked(Player::Player1, 0)?);
+        Ok(())
+    }
+
+    #[test]
+    fn blocked_player0_a() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player1, 1, 2)?;
+        assert!(board.blocked(Player::Player0, 22)?);
+        Ok(())
+    }
+
+    #[test]
+    fn blocked_player1_a() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player0, 1, 2)?;
+        assert!(board.blocked(Player::Player1, 22)?);
+        Ok(())
+    }
+
+    #[test]
+    fn blocked_invalid_player() {
+        let board = Board::new();
+        assert!(board.blocked(Player::Nobody, 0).is_err());
+    }
+
+    #[test]
+    fn blocked_invalid_field() {
+        let board = Board::new();
+        assert!(board.blocked(Player::Player0, 24).is_err());
+    }
+
+    #[test]
+    fn set_field_with_1_checker_player0_a() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player0, 1, 1)?;
+        board.set(Player::Player1, 22, 1)?;
+        assert_eq!(board.get().board[1], -1);
+        assert_eq!(board.get().bar.0, 1);
+        Ok(())
+    }
+
+    #[test]
+    fn set_field_with_1_checker_player0_b() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player0, 1, 1)?;
+        board.set_bar(Player::Player0, 5)?;
+        board.set(Player::Player1, 22, 1)?;
+        assert_eq!(board.get().board[1], -1);
+        assert_eq!(board.get().bar.0, 6);
+        Ok(())
+    }
+
+    #[test]
+    fn set_field_with_1_checker_player1_a() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player1, 1, 1)?;
+        board.set(Player::Player0, 22, 1)?;
+        assert_eq!(board.get().board[22], 1);
+        assert_eq!(board.get().bar.1, 1);
+        Ok(())
+    }
+
+    #[test]
+    fn set_field_with_1_checker_player1_b() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player1, 1, 1)?;
+        board.set_bar(Player::Player1, 5)?;
+        board.set(Player::Player0, 22, 1)?;
+        assert_eq!(board.get().board[22], 1);
+        assert_eq!(board.get().bar.1, 6);
+        Ok(())
     }
 }
