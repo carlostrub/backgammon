@@ -2,7 +2,7 @@
 //! This crate provides a pure, canonical implementation of the game
 //! [*Backgammon.*](https://en.wikipedia.org/wiki/Backgammon)
 //!
-//! ![Backgammon](https://upload.wikimedia.org/wikipedia/commons/3/30/Backgammon_lg.png)
+//! <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Backgammon_lg.png" height="100">
 //!
 //! ## Supported Doubling Cube Rules
 //! The following [`rules`](`crate::rules::Rules`) on the doubling cube are supported:
