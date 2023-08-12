@@ -7,6 +7,23 @@ use serde::{Deserialize, Serialize};
 /// A Backgammon board consists of 24 fields, each of which can hold 0 or more checkers. In
 /// addition there is a bar to hold checkers that have been hit and an off area to hold checkers
 /// that have been removed from the board.
+///
+/// ```
+/// +12-11-10--9--8--7-------6--5--4--3--2--1-+
+/// | X           O    |   | O              X | +-------+
+/// | X           O    |   | O              X | | OFF O |
+/// | X           O    |   | O                | +-------+
+/// | X                |   | O                |
+/// | X                |   | O                |
+/// |                  |BAR|                  |
+/// | O                |   | X                |
+/// | O                |   | X                |
+/// | O           X    |   | X                | +-------+
+/// | O           X    |   | X              O | | OFF X |
+/// | O           X    |   | X              O | +-------+
+/// +13-14-15-16-17-18------19-20-21-22-23-24-+
+/// ```
+
 #[derive(Debug, Clone, Serialize, PartialEq, Deserialize, Default)]
 pub struct Board {
     raw_board: (PlayerBoard, PlayerBoard),
