@@ -17,3 +17,15 @@ impl Dices {
         Dices(between.sample(&mut rng), between.sample(&mut rng))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_roll() {
+        let dices = Dices::default().roll();
+        assert!(dices.0 >= 1 && dices.0 <= 6);
+        assert!(dices.1 >= 1 && dices.1 <= 6);
+    }
+}

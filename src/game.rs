@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Represents a Backgammon game
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Game {
     /// rules of the game
     pub rules: Rules,
@@ -38,23 +38,6 @@ pub struct Game {
     pub since_crawford: u8,
 }
 
-// Backgammon uses 15 checkers per side
-//const CHECKERS: u8 = 15;
-impl Default for Game {
-    fn default() -> Self {
-        Game {
-            rules: Rules::default(),
-            dices: Dices::default(),
-            cube: Cube::default(),
-            who_plays: Player::Nobody,
-            board: Board::default(),
-            cube_received: false,
-            crawford: false,
-            since_crawford: 0,
-        }
-    }
-}
-
 // implement Display trait
 impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -64,9 +47,9 @@ impl fmt::Display for Game {
         s.push_str(&format!("Cube: {}\n", self.cube.value()));
         s.push_str(&format!("Cube owner: {}\n", self.cube.owner()));
         s.push_str(&format!("Who plays: {}\n", self.who_plays));
-        s.push_str(&format!("Board: {:?}\n", self.board));
-        s.push_str(&format!("Crawford: {}\n", self.crawford));
-        s.push_str(&format!("Since Crawford: {}\n", self.since_crawford));
+        s.push_str(&format!("Board: {:?}\n", self.board.get()));
+        s.push_str(&format!("Crawford game: {}\n", self.crawford));
+        s.push_str(&format!("Since Crawford game: {}\n", self.since_crawford));
         write!(f, "{}", s)
     }
 }
