@@ -8,13 +8,12 @@
 //!
 //! println!("{}", g);
 //! ```
-use crate::error::Error;
 use crate::rules::Board;
 use crate::rules::Cube;
+use crate::rules::Dices;
 use crate::rules::Player;
 use crate::rules::{Rules, SetRules};
 
-use rand::distributions::{Distribution, Uniform};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -24,7 +23,7 @@ pub struct Game {
     /// rules of the game
     pub rules: Rules,
     /// last dice pair rolled
-    pub dices: (u8, u8),
+    pub dices: Dices,
     /// whose turn is it?
     pub who_plays: Player,
     /// board for player 0 and 1
@@ -45,7 +44,7 @@ impl Default for Game {
     fn default() -> Self {
         Game {
             rules: Rules::default(),
-            dices: (0, 0),
+            dices: Dices::default(),
             cube: Cube::default(),
             who_plays: Player::Nobody,
             board: Board::default(),
@@ -80,33 +79,6 @@ impl Game {
 
     // Winner of the game
     //pub fn winner(&self) -> Player {}
-
-    /// Roll the dices which generates two random numbers between 1 and 6, replicating a perfect
-    /// dice. We use the operating systems random number generator.
-    pub fn roll(mut self, p: Player) -> Result<Self, Error> {
-        let between = Uniform::new_inclusive(1, 6);
-        let mut rng = rand::thread_rng();
-
-        // Only roll if it is the turn of the player or if nobody has the turn (which means the
-        // game starts)
-        match self.who_plays == p || self.who_plays == Player::Nobody {
-            false => Err(Error::PlayerTurn),
-            true => match self.cube_received {
-                true => Err(Error::CubeReceived),
-                false => {
-                    self.dices = (between.sample(&mut rng), between.sample(&mut rng));
-                    if self.who_plays == Player::Nobody && self.dices.0 != self.dices.1 {
-                        if self.dices.0 > self.dices.1 {
-                            self.who_plays = Player::Player0;
-                        } else {
-                            self.who_plays = Player::Player1;
-                        }
-                    }
-                    Ok(self)
-                }
-            },
-        }
-    }
 
     //    fn calculate_free_positions(&mut self) {
     //        // set free positions of computer to zero
@@ -178,5 +150,3 @@ impl SetRules for Game {
         self
     }
 }
-
-// Unit tests

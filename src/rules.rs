@@ -8,6 +8,9 @@ pub use cube::Cube;
 /// Implements the players
 mod player;
 pub use player::Player;
+/// Implements the pair of dices
+mod dices;
+pub use dices::Dices;
 
 use serde::{Deserialize, Serialize};
 use std::fmt;
