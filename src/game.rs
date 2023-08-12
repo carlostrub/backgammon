@@ -2,9 +2,8 @@
 //! Start a game by calling:
 //! ```
 //! use backgammon::game::Game;
-//! use backgammon::rules::Player;
 //!
-//! let mut g = Game::new().roll(Player::Nobody).unwrap();
+//! let mut g = Game::new();
 //!
 //! println!("{}", g);
 //! ```
