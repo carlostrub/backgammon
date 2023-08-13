@@ -1,5 +1,5 @@
 use crate::game::Game;
-use crate::rules::{Rules, SetRules};
+use crate::rules::{GameRules, MatchRules, Rules};
 
 use std::fmt;
 
@@ -40,12 +40,20 @@ impl Match {
 }
 
 /// Implements SetRules for Match
-impl SetRules for Match {
+impl MatchRules for Match {
     fn with_points(mut self, points: u32) -> Self {
         self.rules.points = points;
         self
     }
 
+    fn with_crawford(mut self) -> Self {
+        self.rules.crawford = true;
+        self
+    }
+}
+
+/// Implements SetRules for Match
+impl GameRules for Match {
     fn with_beaver(mut self) -> Self {
         self.rules.beaver = true;
         self
@@ -67,17 +75,11 @@ impl SetRules for Match {
         self
     }
 
-    fn with_crawford(mut self) -> Self {
-        self.rules.crawford = true;
-        self
-    }
-
     fn with_holland(mut self) -> Self {
         self.rules.holland = true;
         self
     }
 }
-
 // Unit tests
 #[cfg(test)]
 mod tests {

@@ -84,14 +84,14 @@ impl Board {
 
     /// Set checkers for a player on a field
     ///
-    /// This method sets the amount of checkers for a player on a field. The field is numbered from
+    /// This method adds the amount of checkers for a player on a field. The field is numbered from
     /// 0 to 23, starting from the last field of each player in the home board, the most far away
     /// field for each player (where there are 2 checkers to start with) is number 23.
     ///
     /// If the field is blocked for the player, an error is returned. If the field is not blocked,
-    /// but there is already one checker from the other player on the field, the checker is hit and
+    /// but there is already one checker from the other player on the field, that checker is hit and
     /// moved to the bar.
-    pub fn set(&mut self, player: Player, field: usize, amount: u8) -> Result<(), Error> {
+    pub fn set(&mut self, player: Player, field: usize, amount: i8) -> Result<(), Error> {
         if self.blocked(player, field)? {
             return Err(Error::FieldBlocked);
         }
@@ -101,13 +101,25 @@ impl Board {
 
         match player {
             Player::Player0 => {
-                self.raw_board.0.board[field] = amount;
+                let new = self.raw_board.0.board[field] as i8 + amount;
+                if new < 0 {
+                    return Err(Error::MoveInvalid);
+                }
+                self.raw_board.0.board[field] = new as u8;
+
+                // in case one opponent's checker is hit, move it to the bar
                 self.raw_board.1.bar += self.raw_board.1.board[23 - field];
                 self.raw_board.1.board[23 - field] = 0;
                 Ok(())
             }
             Player::Player1 => {
-                self.raw_board.1.board[field] = amount;
+                let new = self.raw_board.1.board[field] as i8 + amount;
+                if new < 0 {
+                    return Err(Error::MoveInvalid);
+                }
+                self.raw_board.1.board[field] = new as u8;
+
+                // in case one opponent's checker is hit, move it to the bar
                 self.raw_board.0.bar += self.raw_board.0.board[23 - field];
                 self.raw_board.0.board[23 - field] = 0;
                 Ok(())
@@ -190,6 +202,14 @@ impl Default for PlayerBoard {
             off: 0,
         }
     }
+}
+
+/// Trait to move checkers
+pub trait Move {
+    /// Move one checker
+    fn move_checker(&mut self, player: Player, from: usize, to: usize) -> Result<&mut Self, Error>
+    where
+        Self: Sized;
 }
 
 // Unit Tests
@@ -378,6 +398,22 @@ mod tests {
         board.set(Player::Player0, 22, 1)?;
         assert_eq!(board.get().board[22], 1);
         assert_eq!(board.get().bar.1, 6);
+        Ok(())
+    }
+
+    #[test]
+    fn set_field_with_2_checkers_player0_a() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player0, 23, 2)?;
+        assert_eq!(board.get().board[23], 4);
+        Ok(())
+    }
+
+    #[test]
+    fn set_field_with_2_checkers_player0_b() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set(Player::Player0, 23, -1)?;
+        assert_eq!(board.get().board[23], 1);
         Ok(())
     }
 }

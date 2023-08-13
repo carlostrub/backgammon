@@ -1,17 +1,10 @@
-//! # Backgammon Game
-//! Start a game by calling:
-//! ```
-//! use backgammon::game::Game;
-//!
-//! let mut g = Game::new();
-//!
-//! println!("{}", g);
-//! ```
-use crate::rules::Board;
+//! # Play a Backgammon Game
 use crate::rules::Cube;
-use crate::rules::Dices;
 use crate::rules::Player;
-use crate::rules::{Rules, SetRules};
+use crate::rules::{Board, Move};
+use crate::rules::{Dices, Roll};
+use crate::rules::{GameRules, Rules};
+use crate::Error;
 
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -26,15 +19,17 @@ pub struct Game {
     /// whose turn is it?
     pub who_plays: Player,
     /// board for player 0 and 1
-    board: Board,
+    pub board: Board,
     /// cube value and owner
-    cube: Cube,
-    /// was cube offered to the one who plays?
-    pub cube_received: bool,
+    pub cube: Cube,
     /// Crawford rule: if crawford game, no doubling allowed
-    pub crawford: bool,
+    crawford: bool,
     /// Holland rule: if <4 rolls of crawford game, no doubling allowed
-    pub since_crawford: u8,
+    since_crawford: u8,
+    /// true if player has to move his checkers, i.e. after roll
+    move_first: bool,
+    /// if cube was offered, player has to accept first and only then can move on
+    cube_received: bool,
 }
 
 // implement Display trait
@@ -94,13 +89,46 @@ impl Game {
     //    }
 }
 
-/// Implements SetRules for Game
-impl SetRules for Game {
-    fn with_points(mut self, points: u32) -> Self {
-        self.rules.points = points;
-        self
-    }
+impl Roll for Game {
+    fn roll(&mut self) -> Result<&mut Self, Error> {
+        if self.move_first {
+            return Err(Error::MoveFirst);
+        }
+        if self.cube_received {
+            return Err(Error::CubeReceived);
+        }
 
+        self.dices = self.dices.roll();
+        if self.who_plays == Player::Nobody {
+            if self.dices.0 > self.dices.1 {
+                self.who_plays = Player::Player0;
+            } else {
+                self.who_plays = Player::Player1;
+            }
+        }
+        Ok(self)
+    }
+}
+
+impl Move for Game {
+    fn move_checker(&mut self, player: Player, from: usize, to: usize) -> Result<&mut Self, Error> {
+        // check if player is allowed to move
+        if player != self.who_plays {
+            return Err(Error::NotYourTurn);
+        }
+
+        // set the checker
+        self.board.set(player, to, 1)?;
+
+        // remove old checker
+        self.board.set(player, from, -1)?;
+
+        Ok(self)
+    }
+}
+
+/// Implements SetRules for Game
+impl GameRules for Game {
     fn with_beaver(mut self) -> Self {
         self.rules.beaver = true;
         self
@@ -122,13 +150,38 @@ impl SetRules for Game {
         self
     }
 
-    fn with_crawford(mut self) -> Self {
-        self.rules.crawford = true;
-        self
-    }
-
     fn with_holland(mut self) -> Self {
         self.rules.holland = true;
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_roll() -> Result<(), Error> {
+        let mut g = Game::new();
+        let g = g.roll()?;
+        assert!(g.dices.0 >= 1 && g.dices.0 <= 6);
+        assert!(g.dices.1 >= 1 && g.dices.1 <= 6);
+        Ok(())
+    }
+
+    #[test]
+    fn test_move_checker() -> Result<(), Error> {
+        let mut g = Game::new();
+        let g = g.roll()?;
+        let g = g.move_checker(g.who_plays, 23, 22)?;
+
+        if g.who_plays == Player::Player1 {
+            assert_eq!(g.board.get().board[0], -1);
+            assert_eq!(g.board.get().board[1], -1);
+        } else {
+            assert_eq!(g.board.get().board[23], 1);
+            assert_eq!(g.board.get().board[22], 1);
+        }
+        Ok(())
     }
 }

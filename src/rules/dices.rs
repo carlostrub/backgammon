@@ -1,10 +1,11 @@
+use crate::Error;
 use rand::distributions::{Distribution, Uniform};
 use serde::{Deserialize, Serialize};
 
 /// Represents the two dices
 ///
 /// Backgammon is always played with two dices.
-#[derive(Debug, Clone, Serialize, PartialEq, Deserialize, Default)]
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Deserialize, Default)]
 pub struct Dices(pub u8, pub u8);
 
 impl Dices {
@@ -16,6 +17,12 @@ impl Dices {
 
         Dices(between.sample(&mut rng), between.sample(&mut rng))
     }
+}
+
+/// Trait to roll the dices
+pub trait Roll {
+    /// Roll the dices
+    fn roll(&mut self) -> Result<&mut Self, Error>;
 }
 
 #[cfg(test)]

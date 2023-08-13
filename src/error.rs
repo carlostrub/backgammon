@@ -8,12 +8,10 @@ pub enum Error {
     GameStarted,
     /// Game has already ended
     GameEnded,
-    /// Opponent is playing, not your turn.
-    PlayerTurn,
     /// Opponent offered doubling cube. Need to react on this event first.
     CubeReceived,
     /// Doubling not permitted
-    DoubleNotPermitted,
+    DoublingNotPermitted,
     /// Invalid cube value
     CubeValueInvalid,
     /// Invalid player
@@ -22,6 +20,12 @@ pub enum Error {
     FieldBlocked,
     /// Invalid field
     FieldInvalid,
+    /// Not your turn
+    NotYourTurn,
+    /// Invalid move
+    MoveInvalid,
+    /// Move first
+    MoveFirst,
 }
 
 // implement Error trait
@@ -33,7 +37,6 @@ impl fmt::Display for Error {
         match self {
             Error::GameStarted => write!(f, "Game has already started"),
             Error::GameEnded => write!(f, "Game has already ended"),
-            Error::PlayerTurn => write!(f, "Opponent's turn"),
             Error::PlayerInvalid => write!(f, "Invalid player"),
             Error::CubeReceived => {
                 write!(
@@ -42,9 +45,12 @@ impl fmt::Display for Error {
                 )
             }
             Error::CubeValueInvalid => write!(f, "Invalid cube value"),
-            Error::DoubleNotPermitted => write!(f, "Doubling not permitted"),
+            Error::DoublingNotPermitted => write!(f, "Doubling not permitted"),
             Error::FieldBlocked => write!(f, "Field blocked"),
             Error::FieldInvalid => write!(f, "Invalid field"),
+            Error::NotYourTurn => write!(f, "Not your turn"),
+            Error::MoveInvalid => write!(f, "Invalid move"),
+            Error::MoveFirst => write!(f, "Move first"),
         }
     }
 }

@@ -50,7 +50,7 @@ impl Cube {
         if self.owner == Player::Nobody || self.owner != opponent {
             Ok(2u64.pow(1 + self.exponential as u32))
         } else {
-            Err(Error::DoubleNotPermitted)
+            Err(Error::DoublingNotPermitted)
         }
     }
 }

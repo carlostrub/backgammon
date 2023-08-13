@@ -4,7 +4,7 @@
 # Usage: make readme
 #
 
-all: readme doc
+all: readme doc test
 
 .PHONY: readme
 readme:
@@ -19,3 +19,6 @@ doc:
 doc-all:
 	rm -r /usr/local/www/backgammon/doc;
 	cp -r target/doc /usr/local/www/backgammon/doc;
+
+test:
+	cargo test

@@ -1,7 +1,6 @@
 /// Implements the board
 mod board;
-pub use board::Board;
-pub use board::BoardDisplay;
+pub use board::{Board, BoardDisplay, Move};
 /// Implements the double dice or cube
 mod cube;
 pub use cube::Cube;
@@ -10,7 +9,7 @@ mod player;
 pub use player::Player;
 /// Implements the pair of dices
 mod dices;
-pub use dices::Dices;
+pub use dices::{Dices, Roll};
 
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -18,7 +17,7 @@ use std::fmt;
 /// Holds all the rule settings
 #[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Serialize, Deserialize, Hash)]
 pub struct Rules {
-    /// The amount of points to reach for declaring a winner, default is 7.
+    /// The amount of points to reach for declaring a winner of the match, default is 7.
     pub points: u32,
     /// When offered the cube, allow to re-double but keep it, default is false.
     pub beaver: bool,
@@ -68,9 +67,16 @@ impl fmt::Display for Rules {
 }
 
 /// Allows to modify the rules
-pub trait SetRules {
+pub trait MatchRules {
     /// Set the amount of points to reach for declaring a winner
     fn with_points(self, points: u32) -> Self;
+    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
+    /// game
+    fn with_crawford(self) -> Self;
+}
+
+/// Allows to modify the rules
+pub trait GameRules {
     /// When offered the cube, allow to re-double but keep it
     fn with_beaver(self) -> Self;
     /// If a player plays "beaver", the other may double again, letting the opponent keep the cube
@@ -81,20 +87,25 @@ pub trait SetRules {
     /// Gammon and Backgammon only count for double or triple values if the cube has already been
     /// offered
     fn with_jacoby(self) -> Self;
-    /// When a player first reaches a score of points - 1, no doubling is allowed for the following
-    /// game
-    fn with_crawford(self) -> Self;
     /// Permits to double after Crawford game only if both players have rolled at least twice
     fn with_holland(self) -> Self;
 }
 
 /// Implements SetRules for Rules
-impl SetRules for Rules {
+impl MatchRules for Rules {
     fn with_points(mut self, points: u32) -> Self {
         self.points = points;
         self
     }
 
+    fn with_crawford(mut self) -> Self {
+        self.crawford = true;
+        self
+    }
+}
+
+/// Implements SetRules for Rules
+impl GameRules for Rules {
     fn with_beaver(mut self) -> Self {
         self.beaver = true;
         self
@@ -113,11 +124,6 @@ impl SetRules for Rules {
 
     fn with_jacoby(mut self) -> Self {
         self.jacoby = true;
-        self
-    }
-
-    fn with_crawford(mut self) -> Self {
-        self.crawford = true;
         self
     }
 

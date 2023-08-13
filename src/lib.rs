@@ -26,7 +26,7 @@
 //! Typically, you want to define the points for a match, hence:
 //! ```
 //! use backgammon::r#match::Match;
-//! use backgammon::rules::SetRules;
+//! use backgammon::rules::MatchRules;
 //!
 //! let mut m = Match::new().
 //! with_points(13);
@@ -36,12 +36,26 @@
 //! rules too:
 //! ```
 //! use backgammon::r#match::Match;
-//! use backgammon::rules::SetRules;
+//! use backgammon::rules::{MatchRules, GameRules};
 //!
 //! let mut m = Match::new().
 //! with_points(13).
 //! with_jacoby();
 //!
+//! ```
+//!
+//! Play a game by calling:
+//! ```
+//! use backgammon::Game;
+//! use backgammon::rules::{Roll,GameRules};
+//!
+//! let mut g = Game::new();
+//!
+//! // set rules
+//! g = g.with_beaver().with_raccoon().with_murphy(3).with_jacoby().with_holland();
+//!
+//! // roll dices
+//! let g = g.roll();
 //! ```
 //! ## Design Philosophy
 //! This library is designed to offer completely stateless game functions. This means that it
@@ -80,10 +94,11 @@
 )] // be tough on code quality
 
 /// Implements all possible Backgammon errors
-pub(crate) mod error;
+mod error;
 pub use error::Error;
 /// Implements a Backgammon game
-pub mod game;
+mod game;
+pub use game::Game;
 /// Implements a Backgammon match
 pub mod r#match;
 /// Implements the board, the dices, the cube, and all other Backgammon rules
