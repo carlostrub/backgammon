@@ -54,3 +54,32 @@ impl fmt::Display for Error {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_error_display() {
+        assert_eq!(
+            format!("{}", Error::GameStarted),
+            "Game has already started"
+        );
+        assert_eq!(format!("{}", Error::GameEnded), "Game has already ended");
+        assert_eq!(format!("{}", Error::PlayerInvalid), "Invalid player");
+        assert_eq!(
+            format!("{}", Error::CubeReceived),
+            "Opponent offered dice. Need to first accept or decline the doubling dice."
+        );
+        assert_eq!(format!("{}", Error::CubeValueInvalid), "Invalid cube value");
+        assert_eq!(
+            format!("{}", Error::DoublingNotPermitted),
+            "Doubling not permitted"
+        );
+        assert_eq!(format!("{}", Error::FieldBlocked), "Field blocked");
+        assert_eq!(format!("{}", Error::FieldInvalid), "Invalid field");
+        assert_eq!(format!("{}", Error::NotYourTurn), "Not your turn");
+        assert_eq!(format!("{}", Error::MoveInvalid), "Invalid move");
+        assert_eq!(format!("{}", Error::MoveFirst), "Move first");
+    }
+}
