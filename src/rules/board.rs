@@ -416,4 +416,28 @@ mod tests {
         assert_eq!(board.get().board[23], 1);
         Ok(())
     }
+
+    #[test]
+    fn set_field_blocked() {
+        let mut board = Board::new();
+        assert!(board.set(Player::Player0, 0, 2).is_err());
+    }
+
+    #[test]
+    fn set_wrong_field1() {
+        let mut board = Board::new();
+        assert!(board.set(Player::Player0, 50, 2).is_err());
+    }
+
+    #[test]
+    fn set_wrong_amount0() {
+        let mut board = Board::new();
+        assert!(board.set(Player::Player0, 23, -3).is_err());
+    }
+
+    #[test]
+    fn set_wrong_amount1() {
+        let mut board = Board::new();
+        assert!(board.set(Player::Player1, 0, -3).is_err());
+    }
 }

@@ -136,4 +136,12 @@ mod tests {
         assert_eq!(offer, 4);
         Ok(())
     }
+
+    #[test]
+    fn offer_error() -> Result<(), Error> {
+        let mut cube = Cube::default();
+        cube.set_owner(Player::Player1);
+        assert!(cube.offer(Player::Player1).is_err());
+        Ok(())
+    }
 }
