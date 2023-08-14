@@ -10,7 +10,7 @@ repository = "https://github.com/carlostrub/backgammon"
 license = "BSD-2-Clause"
 keywords = ["backgammon","gamedev"]
 categories = ["game-development"]
-exclude = ["Makefile", "build.sh", "bitbucket-pipelines.yml", ".github/"]
+exclude = ["build.sh", "bitbucket-pipelines.yml", ".github/"]
 
 [badges]
 maintenance = { status = "actively-developed" }

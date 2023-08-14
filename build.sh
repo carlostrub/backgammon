@@ -17,11 +17,15 @@ cargo build -v
 echo "Running tests..."
 cargo test -v --no-fail-fast
 
-# Running tests
+# Create documentation
 echo "Create the documentation..."
 cargo doc
-rm -r /usr/local/www/backgammon/doc
-cp -r target/doc /usr/local/www/backgammon/
+rm -r /usr/local/www/backgammon/doc/backgammon;
+cp -r target/doc/backgammon /usr/local/www/backgammon/doc/backgammon;
+
+# Create README
+echo "Create README.md"
+cargo readme > README.md
 
 # Checking coverage
 #echo "Checking coverage..."
