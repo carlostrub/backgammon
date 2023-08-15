@@ -31,3 +31,16 @@ impl fmt::Display for Player {
         }
     }
 }
+
+// Test Display trait for Player
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_display() {
+        assert_eq!(format!("{}", Player::Nobody), "Nobody");
+        assert_eq!(format!("{}", Player::Player0), "Player 0");
+        assert_eq!(format!("{}", Player::Player1), "Player 1");
+    }
+}

@@ -22,14 +22,14 @@ The following [`rules`](`crate::rules::Rules`) on the doubling cube are supporte
 Start a new backgammon match over the default amount of points and with the default rules, as
 defined in [`Rules`](`crate::rules::Rules`):
 ```rust
-use backgammon::r#match::Match;
+use backgammon::Match;
 
 let mut m = Match::new();
 
 ```
 Typically, you want to define the points for a match, hence:
 ```rust
-use backgammon::r#match::Match;
+use backgammon::Match;
 use backgammon::rules::MatchRules;
 
 let mut m = Match::new().
@@ -39,7 +39,7 @@ with_points(13);
 Depending on the style of tournament you decide to play, it makes sense to select one or more
 rules too:
 ```rust
-use backgammon::r#match::Match;
+use backgammon::Match;
 use backgammon::rules::{MatchRules, GameRules};
 
 let mut m = Match::new().

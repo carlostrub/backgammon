@@ -182,4 +182,13 @@ mod tests {
         let rules = Rules::default().with_raccoon();
         assert!(rules.raccoon);
     }
+
+    #[test]
+    fn test_display() {
+        let rules = Rules::default();
+        assert_eq!(
+            format!("{}", rules),
+            "Points: 7, Beaver: false, Raccoon: false, Murphy: false, Murphy Limit: 0, Jacoby: false, Crawford: true, Holland: false"
+        );
+    }
 }

@@ -27,7 +27,7 @@ impl fmt::Display for Match {
 impl Match {
     /// Start a new match:
     /// ```
-    /// use backgammon::r#match::Match;
+    /// use backgammon::Match;
     ///
     /// let m = Match::new();
     ///
