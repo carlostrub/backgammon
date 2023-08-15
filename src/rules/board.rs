@@ -92,11 +92,12 @@ impl Board {
     /// but there is already one checker from the other player on the field, that checker is hit and
     /// moved to the bar.
     pub fn set(&mut self, player: Player, field: usize, amount: i8) -> Result<(), Error> {
-        if self.blocked(player, field)? {
-            return Err(Error::FieldBlocked);
-        }
         if field > 23 {
             return Err(Error::FieldInvalid);
+        }
+
+        if self.blocked(player, field)? {
+            return Err(Error::FieldBlocked);
         }
 
         match player {

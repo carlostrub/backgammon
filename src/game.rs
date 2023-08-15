@@ -184,4 +184,31 @@ mod tests {
         }
         Ok(())
     }
+
+    // Test Display trait for Game
+    #[test]
+    fn test_display() {
+        let g = Game::new();
+        assert_eq!(
+            format!("{}", g),
+            "Rules: Points: 7, Beaver: false, Raccoon: false, Murphy: false, Murphy Limit: 0, Jacoby: false, Crawford: true, Holland: false\nDices: Dices(0, 0)\nCube: 1\nCube owner: Nobody\nWho plays: Nobody\nBoard: BoardDisplay { board: [-2, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, -5, 5, 0, 0, 0, -3, 0, -5, 0, 0, 0, 0, 2], bar: (0, 0), off: (0, 0) }\nCrawford game: false\nSince Crawford game: 0\n"
+        );
+    }
+
+    // Test GameRules trait for Game
+    #[test]
+    fn test_game_rules() {
+        let g = Game::new()
+            .with_beaver()
+            .with_raccoon()
+            .with_murphy(3)
+            .with_jacoby()
+            .with_holland();
+        assert!(g.rules.beaver);
+        assert!(g.rules.raccoon);
+        assert!(g.rules.murphy);
+        assert_eq!(g.rules.murphy_limit, 3);
+        assert!(g.rules.jacoby);
+        assert!(g.rules.holland);
+    }
 }

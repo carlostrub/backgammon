@@ -124,4 +124,14 @@ mod tests {
         let m = Match::new().with_points(5).with_points(3);
         assert_eq!(m.rules.points, 3);
     }
+
+    // test Display trait
+    #[test]
+    fn test_display() {
+        let m = Match::new();
+        assert_eq!(
+            format!("{}", m),
+            "Match with rules: Rules { points: 7, beaver: false, raccoon: false, murphy: false, murphy_limit: 0, jacoby: false, crawford: true, holland: false } and Games: []"
+        );
+    }
 }
