@@ -1,8 +1,10 @@
 #!/bin/sh
-# This script is used to build and test the project.
+# This script is used to build and test the project. If you pass the coveralls
+# token, it will also upload the coverage report to coveralls.io.
 #
 # Usage:
-#  build.sh
+#  build.sh --coveralls <coveralls_token>
+#
 
 # Static Code Analysis
 echo "Running static code analysis..."
@@ -28,8 +30,16 @@ echo "Create README.md"
 cargo readme > README.md
 
 # Checking coverage
-#echo "Checking coverage..."
-#cargo-tarpaulin
+echo "Checking coverage..."
+if [ -z "$2" ]
+then
+    echo "No coveralls token provided. Skipping upload."
+    cargo tarpaulin
+else
+    echo "Uploading coverage report to coveralls.io..."
+    cargo tarpaulin --coveralls $2
+fi
+
 
 # Checking audit reports
 echo "Checking audit reports..."
