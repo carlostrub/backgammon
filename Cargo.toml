@@ -17,4 +17,4 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 rand = "0.8"
-serde = { version = "<=1.0.171", features = ["derive"] } # Do not modify
+serde = { version = "<=1.0.186", features = ["derive"] } # Do not modify
