@@ -16,5 +16,5 @@ exclude = ["build.sh", "bitbucket-pipelines.yml", ".github/"]
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-rand = "0.8"
-serde = { version = "<=1.0.171", features = ["derive"] } # Do not modify
+rand = "0.8.5"
+serde = { version = "1.0.185", features = ["derive"] }

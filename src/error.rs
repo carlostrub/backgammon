@@ -24,8 +24,14 @@ pub enum Error {
     NotYourTurn,
     /// Invalid move
     MoveInvalid,
+    /// Invalid move, checker on bar
+    MoveInvalidBar,
     /// Move first
     MoveFirst,
+    /// Roll first
+    RollFirst,
+    /// Dice Invalid
+    DiceInvalid,
 }
 
 // implement Error trait
@@ -51,6 +57,9 @@ impl fmt::Display for Error {
             Error::NotYourTurn => write!(f, "Not your turn"),
             Error::MoveInvalid => write!(f, "Invalid move"),
             Error::MoveFirst => write!(f, "Move first"),
+            Error::RollFirst => write!(f, "Roll first"),
+            Error::DiceInvalid => write!(f, "Invalid dice"),
+            Error::MoveInvalidBar => write!(f, "Invalid move, checker on bar"),
         }
     }
 }
@@ -81,5 +90,11 @@ mod tests {
         assert_eq!(format!("{}", Error::NotYourTurn), "Not your turn");
         assert_eq!(format!("{}", Error::MoveInvalid), "Invalid move");
         assert_eq!(format!("{}", Error::MoveFirst), "Move first");
+        assert_eq!(format!("{}", Error::RollFirst), "Roll first");
+        assert_eq!(format!("{}", Error::DiceInvalid), "Invalid dice");
+        assert_eq!(
+            format!("{}", Error::MoveInvalidBar),
+            "Invalid move, checker on bar"
+        );
     }
 }

@@ -21,7 +21,7 @@ cargo test -v --no-fail-fast
 
 # Create documentation
 echo "Create the documentation..."
-cargo doc
+cargo doc --document-private-items --no-deps;
 rm -r /usr/local/www/backgammon/doc/backgammon;
 cp -r target/doc/backgammon /usr/local/www/backgammon/doc/backgammon;
 

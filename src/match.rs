@@ -3,7 +3,7 @@ use crate::rules::{GameRules, MatchRules, Rules};
 
 use std::fmt;
 
-/// A Backgammon match consists of a set of rules and a vector of games
+/// Represents a Backgammon match
 #[derive(Debug, Clone, Default)]
 pub struct Match {
     /// The rules set for the match

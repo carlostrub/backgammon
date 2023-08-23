@@ -26,8 +26,8 @@ pub struct Game {
     crawford: bool,
     /// Holland rule: if <4 rolls of crawford game, no doubling allowed
     since_crawford: u8,
-    /// true if player has to move his checkers, i.e. after roll
-    move_first: bool,
+    /// true if player needs to roll first
+    roll_first: bool,
     /// if cube was offered, player has to accept first and only then can move on
     cube_received: bool,
 }
@@ -53,45 +53,15 @@ impl Game {
     pub fn new() -> Self {
         Game::default()
     }
-
-    // Winner of the game
-    //pub fn winner(&self) -> Player {}
-
-    //    fn calculate_free_positions(&mut self) {
-    //        // set free positions of computer to zero
-    //        self.free_positions_computer = 0;
-    //        self.free_positions_opponent = 0;
-    //
-    //        // check bar first
-    //        if self.accounting.board[24] > 0 {
-    //            for i in 0..5 {
-    //                if self.accounting.board[i] > -2 {
-    //                    self.free_positions_computer |= 2u32.pow(i as u32);
-    //                }
-    //            }
-    //        } else {
-    //            for i in 0..23 {
-    //                if self.accounting.board[i] > -2 {
-    //                    self.free_positions_computer |= 2u32.pow(i as u32);
-    //                }
-    //            }
-    //
-    //            if self.accounting.board[25] > 0 {
-    //                // set free positions of computer to zer
-    //                self.free_positions_opponent = 0;
-    //                for i in 18..23 {
-    //                    if self.accounting.board[i] > -1 {
-    //                        self.free_positions_computer |= 2u32.pow(i as u32);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
 }
 
 impl Roll for Game {
     fn roll(&mut self) -> Result<&mut Self, Error> {
-        if self.move_first {
+        if !self.dices.consumed.0
+            && !self.dices.consumed.1
+            && !self.dices.consumed.2
+            && !self.dices.consumed.3
+        {
             return Err(Error::MoveFirst);
         }
         if self.cube_received {
@@ -100,10 +70,17 @@ impl Roll for Game {
 
         self.dices = self.dices.roll();
         if self.who_plays == Player::Nobody {
-            if self.dices.0 > self.dices.1 {
-                self.who_plays = Player::Player0;
-            } else {
-                self.who_plays = Player::Player1;
+            let diff = self.dices.values.0 - self.dices.values.1;
+            match diff {
+                0 => {
+                    self.who_plays = Player::Nobody;
+                }
+                _ if diff > 0 => {
+                    self.who_plays = Player::Player0;
+                }
+                _ => {
+                    self.who_plays = Player::Player1;
+                }
             }
         }
         Ok(self)
@@ -111,17 +88,128 @@ impl Roll for Game {
 }
 
 impl Move for Game {
-    fn move_checker(&mut self, player: Player, from: usize, to: usize) -> Result<&mut Self, Error> {
+    fn move_checker(&mut self, player: Player, dice: u8, from: usize) -> Result<&mut Self, Error> {
+        // check if move is permitted
+        let _ = self.move_permitted(player, dice)?;
+
+        // check if player has to move checker from bar first
+        if ((player == Player::Player0) && (self.board.get().bar.0 > 0))
+            || ((player == Player::Player1) && (self.board.get().bar.1 > 0))
+        {
+            return Err(Error::MoveInvalidBar);
+        }
+
+        // check if the dice value has been consumed
+        if (dice == self.dices.values.0 && self.dices.consumed.0)
+            || (dice == self.dices.values.1 && self.dices.consumed.1)
+            || (dice == self.dices.values.1 && self.dices.consumed.2)
+            || (dice == self.dices.values.1 && self.dices.consumed.3)
+        {
+            return Err(Error::MoveInvalid);
+        }
+
+        // remove checker from old position
+        self.board.set(player, from, -1)?;
+
+        // move checker to new position, in case it is reaching the off position, set it off
+        let new_position = from as i8 - dice as i8;
+        if new_position < 0 {
+            self.board.set_off(player, 1)?;
+        } else {
+            self.board.set(player, new_position as usize, 1)?;
+        }
+
+        // set dice value to consumed
+        if dice == self.dices.values.0 && !self.dices.consumed.0 {
+            self.dices.consumed.0 = true;
+        } else if dice == self.dices.values.1 && !self.dices.consumed.1 {
+            self.dices.consumed.1 = true;
+        } else if dice == self.dices.values.1 && !self.dices.consumed.2 {
+            self.dices.consumed.2 = true;
+        } else if dice == self.dices.values.1 && !self.dices.consumed.3 {
+            self.dices.consumed.3 = true;
+        }
+
+        // switch to other player if all dices have been consumed
+        if self.dices.consumed.0
+            && self.dices.consumed.1
+            && self.dices.consumed.2
+            && self.dices.consumed.3
+        {
+            self.who_plays = self.who_plays.other();
+            self.roll_first = true;
+        }
+
+        Ok(self)
+    }
+
+    fn move_checker_from_bar(&mut self, player: Player, dice: u8) -> Result<&mut Self, Error> {
+        // check if move is permitted
+        let _ = self.move_permitted(player, dice)?;
+
+        // check if the dice value has been consumed
+        if (dice == self.dices.values.0 && self.dices.consumed.0)
+            || (dice == self.dices.values.1 && self.dices.consumed.1)
+            || (dice == self.dices.values.1 && self.dices.consumed.2)
+            || (dice == self.dices.values.1 && self.dices.consumed.3)
+        {
+            return Err(Error::MoveInvalid);
+        }
+
+        // set the checker from bar
+        self.board.set_bar(player, -1)?;
+        self.board.set(player, 24 - dice as usize, 1)?;
+
+        // set dice value to consumed
+        if dice == self.dices.values.0 && !self.dices.consumed.0 {
+            self.dices.consumed.0 = true;
+        } else if dice == self.dices.values.1 && !self.dices.consumed.1 {
+            self.dices.consumed.1 = true;
+        } else if dice == self.dices.values.1 && !self.dices.consumed.2 {
+            self.dices.consumed.2 = true;
+        } else if dice == self.dices.values.1 && !self.dices.consumed.3 {
+            self.dices.consumed.3 = true;
+        }
+
+        // switch to other player if all dices have been consumed
+        if self.dices.consumed.0
+            && self.dices.consumed.1
+            && self.dices.consumed.2
+            && self.dices.consumed.3
+        {
+            self.who_plays = self.who_plays.other();
+            self.roll_first = true;
+        }
+
+        Ok(self)
+    }
+
+    /// Implements checks to validate if the player is allowed to move
+    fn move_permitted(&mut self, player: Player, dice: u8) -> Result<&mut Self, Error> {
         // check if player is allowed to move
         if player != self.who_plays {
             return Err(Error::NotYourTurn);
         }
 
-        // set the checker
-        self.board.set(player, to, 1)?;
+        // if player is nobody, you can not play and have to roll first
+        if self.who_plays == Player::Nobody {
+            return Err(Error::RollFirst);
+        }
 
-        // remove old checker
-        self.board.set(player, from, -1)?;
+        // check if player has to take or reject cube first
+        if self.cube_received {
+            return Err(Error::CubeReceived);
+        }
+
+        // check if player has to roll first
+        if self.roll_first {
+            return Err(Error::RollFirst);
+        }
+
+        // check if dice value has actually been rolled
+        if dice != self.dices.values.0 && dice != self.dices.values.1 {
+            return Err(Error::DiceInvalid);
+        }
 
         Ok(self)
     }
@@ -164,8 +252,8 @@ mod tests {
     fn test_roll() -> Result<(), Error> {
         let mut g = Game::new();
         let g = g.roll()?;
-        assert!(g.dices.0 >= 1 && g.dices.0 <= 6);
-        assert!(g.dices.1 >= 1 && g.dices.1 <= 6);
+        assert!(g.dices.values.0 >= 1 && g.dices.values.0 <= 6);
+        assert!(g.dices.values.1 >= 1 && g.dices.values.1 <= 6);
         Ok(())
     }
 
@@ -173,7 +261,7 @@ mod tests {
     fn test_move_checker() -> Result<(), Error> {
         let mut g = Game::new();
         let g = g.roll()?;
-        let g = g.move_checker(g.who_plays, 23, 22)?;
+        let g = g.move_checker(g.who_plays, 23, 2)?;
 
         if g.who_plays == Player::Player1 {
             assert_eq!(g.board.get().board[0], -1);
@@ -210,5 +298,20 @@ mod tests {
         assert_eq!(g.rules.murphy_limit, 3);
         assert!(g.rules.jacoby);
         assert!(g.rules.holland);
+    }
+
+    // Test move and switch Player
+    #[test]
+    fn test_move_and_switch_player() -> Result<(), Error> {
+        let mut g = Game::new();
+        let g = g.roll()?;
+        if g.who_plays == Player::Player0 {
+            let g = g.move_checker(g.who_plays, 23, 22)?;
+            assert_eq!(g.who_plays, Player::Player1);
+        } else {
+            let g = g.move_checker(g.who_plays, 0, 1)?;
+            assert_eq!(g.who_plays, Player::Player0);
+        }
+        Ok(())
     }
 }

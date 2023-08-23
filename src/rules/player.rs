@@ -21,6 +21,17 @@ pub enum Player {
     Player1,
 }
 
+impl Player {
+    /// Returns the other player, i.e. the player who is not the current player.
+    pub fn other(&self) -> Self {
+        match *self {
+            Player::Nobody => Player::Nobody,
+            Player::Player0 => Player::Player1,
+            Player::Player1 => Player::Player0,
+        }
+    }
+}
+
 // Implement Display trait for Player
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -42,5 +53,12 @@ mod tests {
         assert_eq!(format!("{}", Player::Nobody), "Nobody");
         assert_eq!(format!("{}", Player::Player0), "Player 0");
         assert_eq!(format!("{}", Player::Player1), "Player 1");
+    }
+
+    #[test]
+    fn test_other() {
+        assert_eq!(Player::Nobody.other(), Player::Nobody);
+        assert_eq!(Player::Player0.other(), Player::Player1);
+        assert_eq!(Player::Player1.other(), Player::Player0);
     }
 }

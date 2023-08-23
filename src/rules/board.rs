@@ -154,30 +154,42 @@ impl Board {
         }
     }
 
-    /// Set checkers for a player on the bar
-    pub fn set_bar(&mut self, player: Player, amount: u8) -> Result<(), Error> {
+    /// Set checkers for a player on the bar. This method adds amount to the already existing
+    /// checkers there.
+    pub fn set_bar(&mut self, player: Player, amount: i8) -> Result<(), Error> {
         match player {
             Player::Player0 => {
-                self.raw_board.0.bar = amount;
+                let new = self.raw_board.0.bar as i8 + amount;
+                if new < 0 {
+                    return Err(Error::MoveInvalid);
+                }
+                self.raw_board.0.bar = new as u8;
                 Ok(())
             }
             Player::Player1 => {
-                self.raw_board.1.bar = amount;
+                let new = self.raw_board.1.bar as i8 + amount;
+                if new < 0 {
+                    return Err(Error::MoveInvalid);
+                }
+                self.raw_board.1.bar = new as u8;
                 Ok(())
             }
             Player::Nobody => Err(Error::PlayerInvalid),
         }
     }
 
-    /// Set checkers for a player off the board
+    /// Set checkers for a player off the board. This method adds amount to the already existing
+    /// checkers there.
     pub fn set_off(&mut self, player: Player, amount: u8) -> Result<(), Error> {
         match player {
             Player::Player0 => {
-                self.raw_board.0.off = amount;
+                let new = self.raw_board.0.off + amount;
+                self.raw_board.0.off = new;
                 Ok(())
             }
             Player::Player1 => {
-                self.raw_board.1.off = amount;
+                let new = self.raw_board.1.off + amount;
+                self.raw_board.1.off = new;
                 Ok(())
             }
             Player::Nobody => Err(Error::PlayerInvalid),
@@ -207,8 +219,18 @@ impl Default for PlayerBoard {
 
 /// Trait to move checkers
 pub trait Move {
-    /// Move one checker
-    fn move_checker(&mut self, player: Player, from: usize, to: usize) -> Result<&mut Self, Error>
+    /// Move a checker
+    fn move_checker(&mut self, player: Player, dice: u8, from: usize) -> Result<&mut Self, Error>
+    where
+        Self: Sized;
+
+    /// Move a checker from bar
+    fn move_checker_from_bar(&mut self, player: Player, dice: u8) -> Result<&mut Self, Error>
+    where
+        Self: Sized;
+
+    /// Move permitted
+    fn move_permitted(&mut self, player: Player, dice: u8) -> Result<&mut Self, Error>
     where
         Self: Sized;
 }
@@ -307,6 +329,24 @@ mod tests {
         let mut board = Board::new();
         board.set_off(Player::Player1, 1)?;
         assert_eq!(board.get().off.1, 1);
+        Ok(())
+    }
+
+    #[test]
+    fn set_player0_off1() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set_off(Player::Player0, 1)?;
+        board.set_off(Player::Player0, 1)?;
+        assert_eq!(board.get().off.1, 2);
+        Ok(())
+    }
+
+    #[test]
+    fn set_player1_off1() -> Result<(), Error> {
+        let mut board = Board::new();
+        board.set_off(Player::Player1, 1)?;
+        board.set_off(Player::Player1, 1)?;
+        assert_eq!(board.get().off.1, 2);
         Ok(())
     }
 
