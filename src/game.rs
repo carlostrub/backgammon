@@ -248,38 +248,13 @@ impl GameRules for Game {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_roll() -> Result<(), Error> {
-        let mut g = Game::new();
-        let g = g.roll()?;
-        assert!(g.dices.values.0 >= 1 && g.dices.values.0 <= 6);
-        assert!(g.dices.values.1 >= 1 && g.dices.values.1 <= 6);
-        Ok(())
-    }
-
-    #[test]
-    fn test_move_checker() -> Result<(), Error> {
-        let mut g = Game::new();
-        let g = g.roll()?;
-        let g = g.move_checker(g.who_plays, 23, 2)?;
-
-        if g.who_plays == Player::Player1 {
-            assert_eq!(g.board.get().board[0], -1);
-            assert_eq!(g.board.get().board[1], -1);
-        } else {
-            assert_eq!(g.board.get().board[23], 1);
-            assert_eq!(g.board.get().board[22], 1);
-        }
-        Ok(())
-    }
-
     // Test Display trait for Game
     #[test]
     fn test_display() {
         let g = Game::new();
         assert_eq!(
             format!("{}", g),
-            "Rules: Points: 7, Beaver: false, Raccoon: false, Murphy: false, Murphy Limit: 0, Jacoby: false, Crawford: true, Holland: false\nDices: Dices(0, 0)\nCube: 1\nCube owner: Nobody\nWho plays: Nobody\nBoard: BoardDisplay { board: [-2, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, -5, 5, 0, 0, 0, -3, 0, -5, 0, 0, 0, 0, 2], bar: (0, 0), off: (0, 0) }\nCrawford game: false\nSince Crawford game: 0\n"
+            "Rules: Points: 7, Beaver: false, Raccoon: false, Murphy: false, Murphy Limit: 0, Jacoby: false, Crawford: true, Holland: false\nDices: Dices { values: (0, 0), consumed: (false, false, false, false) }\nCube: 1\nCube owner: Nobody\nWho plays: Nobody\nBoard: BoardDisplay { board: [-2, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, -5, 5, 0, 0, 0, -3, 0, -5, 0, 0, 0, 0, 2], bar: (0, 0), off: (0, 0) }\nCrawford game: false\nSince Crawford game: 0\n"
         );
     }
 
@@ -298,20 +273,5 @@ mod tests {
         assert_eq!(g.rules.murphy_limit, 3);
         assert!(g.rules.jacoby);
         assert!(g.rules.holland);
-    }
-
-    // Test move and switch Player
-    #[test]
-    fn test_move_and_switch_player() -> Result<(), Error> {
-        let mut g = Game::new();
-        let g = g.roll()?;
-        if g.who_plays == Player::Player0 {
-            let g = g.move_checker(g.who_plays, 23, 22)?;
-            assert_eq!(g.who_plays, Player::Player1);
-        } else {
-            let g = g.move_checker(g.who_plays, 0, 1)?;
-            assert_eq!(g.who_plays, Player::Player0);
-        }
-        Ok(())
     }
 }

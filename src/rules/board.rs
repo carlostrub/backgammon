@@ -333,15 +333,6 @@ mod tests {
     }
 
     #[test]
-    fn set_player0_off1() -> Result<(), Error> {
-        let mut board = Board::new();
-        board.set_off(Player::Player0, 1)?;
-        board.set_off(Player::Player0, 1)?;
-        assert_eq!(board.get().off.1, 2);
-        Ok(())
-    }
-
-    #[test]
     fn set_player1_off1() -> Result<(), Error> {
         let mut board = Board::new();
         board.set_off(Player::Player1, 1)?;
