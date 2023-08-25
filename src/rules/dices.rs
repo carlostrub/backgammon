@@ -54,4 +54,14 @@ mod tests {
         assert!(dices.values.0 >= 1 && dices.values.0 <= 6);
         assert!(dices.values.1 >= 1 && dices.values.1 <= 6);
     }
+
+    #[test]
+    fn test_roll_consumed() {
+        let dices = Dices::default().roll();
+        if dices.values.0 == dices.values.1 {
+            assert_eq!(dices.consumed, (false, false, false, false));
+        } else {
+            assert_eq!(dices.consumed, (false, false, true, true));
+        }
+    }
 }

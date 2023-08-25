@@ -470,6 +470,6 @@ mod tests {
     #[test]
     fn set_wrong_amount1() {
         let mut board = Board::new();
-        assert!(board.set(Player::Player1, 0, -3).is_err());
+        assert!(board.set(Player::Player1, 23, -3).is_err());
     }
 }
