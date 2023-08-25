@@ -64,4 +64,16 @@ mod tests {
             assert_eq!(dices.consumed, (false, false, true, true));
         }
     }
+
+    #[test]
+    fn test_roll_consumed1() {
+        for _i in 0..100 {
+            let dices = Dices::default().roll();
+            if dices.values.0 == dices.values.1 {
+                assert_eq!(dices.consumed, (false, false, false, false));
+            } else {
+                assert_eq!(dices.consumed, (false, false, true, true));
+            }
+        }
+    }
 }
